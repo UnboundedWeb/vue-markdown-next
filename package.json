@@ -35,6 +35,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
+    "vitest": "^4.0.16",
     "vue-eslint-parser": "^10.2.0"
   },
   "lint-staged": {
