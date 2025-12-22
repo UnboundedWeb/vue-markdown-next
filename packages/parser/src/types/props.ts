@@ -1,2 +1,2 @@
 export type RenderType = 'html' | 'hast';
-export type ExtendsProps = 'gfm' | 'mathjax' | 'highlight';
+export type ExtendsProps = 'gfm' | 'mathjax' | 'codeHighlight';

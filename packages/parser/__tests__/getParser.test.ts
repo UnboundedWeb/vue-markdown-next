@@ -1,8 +1,9 @@
 /* eslint-env node */
-import { describe, it, beforeEach } from 'vitest';
+import { describe, it, beforeEach, expect } from 'vitest';
 import type { Processor } from 'unified';
 import type { Root } from 'hast';
 import { getParser } from '../src';
+import { testParserConfig } from './defautlConfig';
 
 type HtmlProcessor = Processor<Root, Root, Root, Root, string>;
 
@@ -14,10 +15,7 @@ describe('getParser 输出示例', () => {
   let parser: HtmlProcessor;
 
   beforeEach(() => {
-    parser = getParser('html', {
-      customTags: [],
-      extends: [],
-    });
+    parser = getParser('html', testParserConfig);
   });
 
   const logHtml = async (
@@ -109,11 +107,28 @@ describe('getParser 输出示例', () => {
 
   describe('数学公式支持', () => {
     it('打印行内数学公式结果', async () => {
-      await logHtml('Math-行内', '这是一个行内公式 $x^2 + y^2 = z^2$');
+      await logHtml('Math-行内', '这是一个行内公式 \\(x^2 + y^2 = z^2\\)');
     });
 
     it('打印块级数学公式结果', async () => {
       await logHtml('Math-块级', '$$\n\\frac{1}{2}\n$$');
+    });
+
+    it('支持 \\(...\\) 行内语法', async () => {
+      const file = await parser.process('这是一个行内公式 \\(x^2 + y^2 = z^2\\)');
+      expect(String(file)).toContain('<mjx-container');
+    });
+
+    it('支持 \\[...\\] 块级语法', async () => {
+      const file = await parser.process('\\[\\frac{1}{2}\\]');
+      expect(String(file)).toContain('display="true"');
+    });
+
+    it('不转换 \\\\(...\\\\) 转义情况', async () => {
+      const file = await parser.process('这是字面量 \\\\(...\\\\)');
+      const html = String(file);
+      expect(html).not.toContain('<mjx-container');
+      expect(html).toContain('\\(');
     });
   });
 
@@ -139,7 +154,6 @@ describe('getParser 输出示例', () => {
     it('打印单个自定义标签', async () => {
       const customParser = getParser('html', {
         customTags: ['custom-component'],
-        extends: [],
       });
       await logHtml(
         'Custom-单标签',
@@ -151,7 +165,6 @@ describe('getParser 输出示例', () => {
     it('打印多个自定义标签', async () => {
       const customParser = getParser('html', {
         customTags: ['custom-one', 'custom-two'],
-        extends: [],
       });
       await logHtml(
         'Custom-多标签',
@@ -209,7 +222,6 @@ function hello() {
     it('打印 HTML 解析结果', async () => {
       const htmlParser = getParser('html', {
         customTags: [],
-        extends: [],
       });
       await logHtml('ReturnType-HTML', '# 测试', htmlParser);
     });
@@ -217,12 +229,10 @@ function hello() {
     it('打印 HAST 解析结果', async () => {
       const astParser = getParser('hast', {
         customTags: [],
-        extends: [],
       });
       const markdown = '# HAST';
-      const file = await astParser.process(markdown);
-      // rehypeStringify 未启用时，树存放在 result 中
-      const tree = (file.result ?? file.value) as unknown;
+      const mdast = astParser.parse(markdown);
+      const tree = (await astParser.run(mdast)) as unknown;
       console.log(
         `\n[ReturnType-HAST] 输入:\n${markdown}\n--------\n输出 AST:\n${JSON.stringify(
           tree,
@@ -257,15 +267,6 @@ function hello() {
     cases.forEach(({ name, markdown }) => {
       it(`打印${name}自定义情况`, async () => {
         await logHtml(`customer-${name}`, markdown);
-      });
-    });
-  });
-  describe('mathjax渲染', () => {
-    const cases = [{ name: 'mathjax', markdown: `\\(10=2^3\\)` }];
-
-    cases.forEach(({ name, markdown }) => {
-      it(`打印${name}mathjax情况`, async () => {
-        await logHtml(`mathjax-${name}`, markdown);
       });
     });
   });
