@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   extends: ['@commitlint/config-conventional'],
   rules: {
     'type-enum': [
@@ -17,6 +17,6 @@ module.exports = {
         'build', // 构建系统或外部依赖的变动
       ],
     ],
-    'subject-case': [0], // There are no restrictions on the subject's capitalization.
+    'subject-case': [0], // 不限制subject的大小写
   },
 };
