@@ -11,6 +11,7 @@ import rehypeRaw from 'rehype-raw';
 import { createSanitizeSchema } from '../utils/createSanitizeSchema';
 import { rehypeConvertAbnormalTagsToText } from '../plugin/rehypeConvertAbnormalTagsToText';
 import rehypeMathJaxChtml from 'rehype-mathjax/chtml';
+import { mathJaxFontUrl } from '../consts/mathjaxdefaultConfig';
 interface RenderProps {
   customTags: string[];
   extends: ExtendsProps[];
@@ -30,7 +31,11 @@ export const getParser = <T extends RenderType>(
     .use(rehypeRaw)
     .use(rehypeConvertAbnormalTagsToText, customTags)
     .use(rehypeSanitize, createSanitizeSchema(customTags));
-  parser = parser.use(rehypeMathJaxChtml, {});
+  parser = parser.use(rehypeMathJaxChtml, {
+    chtml: {
+      fontURL: mathJaxFontUrl,
+    },
+  });
   if (target === 'html') {
     return parser.use(rehypeStringify, {
       allowDangerousHtml: true,

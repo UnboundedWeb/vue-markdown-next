@@ -1,5 +1,5 @@
 import { Root, Element, Text } from 'hast';
-import { createSanitizeSchema } from '../modules/createSanitizeSchema';
+import { createSanitizeSchema } from '../utils/createSanitizeSchema';
 import { visit } from 'unist-util-visit';
 export const rehypeConvertAbnormalTagsToText = (customTags: string[] = []) => {
   return (tree: Root) => {
