@@ -19,6 +19,7 @@ Using unifined as the base, the next-generation vue-markdown renderer supports W
     内置默认两套主题
     @yourlib/theme-default
     @yourlib/theme-github
+    (需要一套规范的类名规范)
 ### 性能优化
     支持 Worker / WorkerPoll 处理
     支持默认套壳，开箱使用, 虚拟滚动(包含Worker)
