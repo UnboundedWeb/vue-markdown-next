@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
-    "test": "echo \"Testing parser...\""
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage"
   },
   "keywords": [
     "markdown",
@@ -32,5 +34,8 @@
     "remark-rehype": "^11.1.2",
     "tsup": "^8.5.1",
     "unified": "^11.0.5"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.16"
   }
 }
