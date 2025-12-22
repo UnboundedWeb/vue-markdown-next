@@ -4,7 +4,8 @@ Using unifined as the base, the next-generation vue-markdown renderer supports W
     -remark
     -unifined
     -comlink
-    // 以下为中间层插件形式, 因为是基于unifined为基座的
+    // 以下为中间层插件形式, 因为是基于unifined为基座的(组件给参数，extends: gfm | mathjax | code高亮)
+    // 用户如果使用hook.就自行进行plugin拓展
     -remark-math
     -rehype-mathjaxh/chtml"
     -remark-gfm
