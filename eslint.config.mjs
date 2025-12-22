@@ -49,6 +49,7 @@ export default [
       '**/dist/**',
       '**/.husky/**',
       '**/pnpm-lock.yaml',
+      '**/__tests__/**',
     ],
   },
 ];
