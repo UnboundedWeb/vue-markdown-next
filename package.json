@@ -1,0 +1,49 @@
+{
+  "name": "markdown-next",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vue markdown monorepo",
+  "scripts": {
+    "dev": "pnpm --filter \"./packages/*\" --parallel dev",
+    "build": "pnpm --filter \"./packages/*\" build",
+    "typecheck": "pnpm --filter \"./packages/*\" typecheck",
+    "lint": "pnpm --filter \"./packages/*\" lint",
+    "lint:fix": "pnpm --filter \"./packages/*\" lint:fix",
+    "test": "pnpm --filter \"./packages/*\" test",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "vue",
+    "markdown",
+    "monorepo"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-vue": "^10.6.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "vue-eslint-parser": "^10.2.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
+}

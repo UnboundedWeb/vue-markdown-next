@@ -1,0 +1,25 @@
+{
+  "name": "@markdown-next/parser",
+  "version": "1.0.0",
+  "description": "Markdown parser for markdown-next",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "test": "echo \"Testing parser...\""
+  },
+  "keywords": [
+    "markdown",
+    "parser"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@markdown-next/shared": "workspace:*"
+  }
+}

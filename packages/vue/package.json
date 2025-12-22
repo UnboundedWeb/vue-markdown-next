@@ -1,0 +1,30 @@
+{
+  "name": "@markdown-next/vue",
+  "version": "1.0.0",
+  "description": "Vue components for markdown-next",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.vue",
+    "lint:fix": "eslint src --ext .ts,.vue --fix",
+    "test": "echo \"Testing vue...\""
+  },
+  "keywords": [
+    "vue",
+    "markdown",
+    "components"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@markdown-next/parser": "workspace:*",
+    "@markdown-next/shared": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  }
+}

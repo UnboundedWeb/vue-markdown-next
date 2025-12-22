@@ -1,0 +1,24 @@
+{
+  "name": "@markdown-next/shared",
+  "version": "1.0.0",
+  "description": "Internal shared utilities (not published)",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "private": true,
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "test": "echo \"Testing shared...\""
+  },
+  "keywords": [
+    "markdown",
+    "shared",
+    "utils"
+  ],
+  "author": "",
+  "license": "MIT"
+}
