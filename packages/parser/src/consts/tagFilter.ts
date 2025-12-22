@@ -31,7 +31,7 @@ export const MATHML_TAG_NAMES: string[] = [
   'annotation-xml',
 ] as const;
 
-// MathML 属性配置
+// MathML attribute configuration
 export const MATHML_ATTRIBUTES: Record<string, string[]> = {
   math: ['display', 'class', 'style', 'xmlns'],
   mrow: ['class', 'style'],

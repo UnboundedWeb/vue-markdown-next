@@ -1,4 +1,4 @@
-// 创建 sanitize 配置
+// Create sanitize schema
 import { defaultSchema } from 'rehype-sanitize';
 import { MATHML_ATTRIBUTES, MATHML_TAG_NAMES } from '../consts/tagFilter';
 

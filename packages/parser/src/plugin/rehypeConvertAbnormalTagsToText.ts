@@ -3,7 +3,7 @@ import { createSanitizeSchema } from '../utils/createSanitizeSchema';
 import { visit } from 'unist-util-visit';
 export const rehypeConvertAbnormalTagsToText = (customTags: string[] = []) => {
   return (tree: Root) => {
-    // 获取所有合法的标签名（HTML + MathML + customTags）
+    // Get all allowed tag names (HTML + MathML + customTags)
     const schema = createSanitizeSchema(customTags);
     const allowedTagNames = new Set(schema.tagNames || []);
 
@@ -12,16 +12,16 @@ export const rehypeConvertAbnormalTagsToText = (customTags: string[] = []) => {
 
       const tagName = (node as Element).tagName;
 
-      // 检查是否为异常标签：
-      // 1. 不在允许的标签列表中
-      // 2. 且包含除了英文字母以外的字符
+      // Check whether it's an abnormal tag:
+      // 1. Not in the allowed tag list
+      // 2. And contains characters other than English letters
       const isAbnormalTag = !allowedTagNames.has(tagName) && /[^a-zA-Z]/.test(tagName);
 
       if (isAbnormalTag) {
-        // 重建原始标签字符串
+        // Rebuild the original tag string
         let tagString = `<${tagName}`;
 
-        // 添加属性
+        // Append attributes
         if ((node as Element).properties) {
           for (const [key, value] of Object.entries((node as Element).properties)) {
             if (Array.isArray(value)) {
@@ -32,10 +32,10 @@ export const rehypeConvertAbnormalTagsToText = (customTags: string[] = []) => {
           }
         }
 
-        // 处理子内容
+        // Handle child content
         let innerContent = '';
         if ((node as Element).children && (node as Element).children.length > 0) {
-          // 递归处理子节点内容
+          // Recursively process child nodes
           const processChildren = (children: Array<Element | Text>): string => {
             return children
               .map((child) => {
@@ -69,13 +69,13 @@ export const rehypeConvertAbnormalTagsToText = (customTags: string[] = []) => {
 
         tagString += `>${innerContent}</${tagName}>`;
 
-        // 创建文本节点替换异常标签
+        // Create a text node to replace the abnormal tag
         const textNode: Text = {
           type: 'text',
           value: tagString,
         };
 
-        // 替换节点
+        // Replace node
         parent.children[index] = textNode;
       }
     });

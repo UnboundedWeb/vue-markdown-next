@@ -7,6 +7,6 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   outDir: 'dist',
   target: 'es2020',
-  minify: true, // 禁用压缩
+  minify: true, // Enable minification
   sourcemap: 'inline',
 });

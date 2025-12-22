@@ -28,8 +28,8 @@ export default [
       },
     },
     rules: {
-      // Parser 包特定规则
-      // 例如：可以放宽某些规则或添加特定的约束
+      // Parser package-specific rules
+      // e.g. relax some rules or add specific constraints
     },
   },
 ];

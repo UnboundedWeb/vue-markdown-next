@@ -7,7 +7,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 export default [
   js.configs.recommended,
 
-  // TypeScript 文件配置
+  // TypeScript file config
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
@@ -22,7 +22,7 @@ export default [
       'prettier': prettierPlugin,
     },
     rules: {
-      // TypeScript 推荐规则
+      // TypeScript recommended rules
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': ['error', {
         argsIgnorePattern: '^_',
@@ -39,10 +39,10 @@ export default [
     },
   },
 
-  // Prettier 配置（禁用冲突规则）
+  // Prettier config (disable conflicting rules)
   prettierConfig,
 
-  // 忽略文件
+  // Ignored files
   {
     ignores: [
       '**/node_modules/**',

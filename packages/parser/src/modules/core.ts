@@ -21,21 +21,21 @@ interface RenderProps {
   customTags?: string[];
   extendedGrammar?: ExtendsProps[];
   /**
-   * 在 `remarkRehype` 之前追加的 remark 插件（处理 Markdown AST）
+   * Remark plugins appended before `remarkRehype` (process Markdown AST)
    */
   remarkPlugins?: PluggableList;
   /**
-   * 在 `rehypeRaw/rehypeSanitize` 之后追加的 rehype 插件（处理 HTML AST）
+   * Rehype plugins appended after `rehypeRaw/rehypeSanitize` (process HTML AST)
    */
   rehypePlugins?: PluggableList;
   /**
-   * MathJax 配置选项（仅在 extendedGrammar 包含 'mathjax' 时生效）
+   * MathJax config options (only effective when extendedGrammar includes 'mathjax')
    * @see https://docs.mathjax.org/en/latest/options/index.html
    */
   mathJaxConfig?: MathJaxOptions;
   /**
-   * 是否支持 LaTeX 语法（使用 \( 和 \[ 作为数学公式分隔符）
-   * 当设置为 true 时，会启用 remarkMathDelimiters 插件来解析 LaTeX 语法
+   * Whether to support LaTeX syntax (using \\( and \\[ as math delimiters)
+   * When true, enables remarkMathDelimiters to parse LaTeX syntax
    * @default false
    */
   supportsLaTeX?: boolean;
@@ -64,7 +64,7 @@ export const getParser = <T extends RenderType>(
     parser = parser.use(remarkMath);
   }
 
-  // 在 remarkRehype 之前追加 remark 插件
+  // Append remark plugins before remarkRehype
   if (remarkPlugins.length > 0) {
     parser = parser.use(remarkPlugins);
   }
@@ -80,7 +80,7 @@ export const getParser = <T extends RenderType>(
     parser = parser.use(rehypeMathJaxChtml, mergedConfig);
   }
 
-  // 在 rehypeRaw/rehypeSanitize 之后追加 rehype 插件
+  // Append rehype plugins after rehypeRaw/rehypeSanitize
   if (rehypePlugins.length > 0) {
     parser = parser.use(rehypePlugins);
   }
