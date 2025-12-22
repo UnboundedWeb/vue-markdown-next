@@ -8,6 +8,11 @@ Using unifined as the base, the next-generation vue-markdown renderer supports W
     -remark-math
     -rehype-mathjaxh/chtml"
     -remark-gfm
+
+    HAST(Worker / 核心parser)
+        ↓
+    业务层
+    JSX runtime → Vue VNode
 ## 架构
 ### 工程化
     打包工具: tsup
