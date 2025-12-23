@@ -8,13 +8,11 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.mjs"
     },
     "./worker": {
       "types": "./dist/modules/parser.worker.d.ts",
-      "import": "./dist/modules/parser.worker.mjs",
-      "require": "./dist/modules/parser.worker.js"
+      "import": "./dist/modules/parser.worker.mjs"
     }
   },
   "files": [
