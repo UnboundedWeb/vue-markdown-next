@@ -23,6 +23,10 @@ export default [
   {
     files: ['src/**/*.ts'],
     languageOptions: {
+      globals: {
+        Worker: 'readonly',
+        URL: 'readonly',
+      },
       parserOptions: {
         project: './tsconfig.json',
       },

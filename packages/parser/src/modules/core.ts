@@ -17,7 +17,7 @@ import { remarkMathDelimiters } from '../plugin/remarkMathDelimiters';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyProcessor = Processor<any, any, any, any, any>;
 
-interface RenderProps {
+export interface RenderProps {
   customTags?: string[];
   extendedGrammar?: ExtendsProps[];
   /**
