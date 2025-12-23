@@ -1,7 +1,13 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  dts: true,
+  dts: {
+    tsconfig: './tsconfig.build.json',
+    compilerOptions: {
+      composite: false,
+      incremental: false,
+    },
+  },
   clean: true,
   entry: ['src/index.ts'],
   format: ['esm', 'cjs'],
@@ -9,4 +15,5 @@ export default defineConfig({
   target: 'es2020',
   minify: true, // Enable minification
   sourcemap: 'inline',
+  shims: true, // Enable shims for import.meta in CJS
 });

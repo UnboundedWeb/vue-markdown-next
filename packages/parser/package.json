@@ -18,9 +18,8 @@
     }
   },
   "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+    "./dist",
+    "./package.json"
   ],
   "scripts": {
     "dev": "tsc --watch",
