@@ -10,7 +10,7 @@ export default [
       },
     },
     rules: {
-      // 可以在这里添加 shared 包特定的规则
+      // You can add shared package-specific rules here
     },
   },
 ];

@@ -10,8 +10,8 @@ export default [
       },
     },
     rules: {
-      // Vue 包特定规则
-      // 可以针对 TypeScript 文件添加额外的规则
+      // Vue package-specific rules
+      // You can add additional rules for TypeScript files
     },
   },
 ];

@@ -1,25 +1,83 @@
 {
   "name": "@markdown-next/parser",
   "version": "1.0.0",
-  "description": "Markdown parser for markdown-next",
+  "description": "Markdown parser for markdown-next with single-threaded and multi-threaded support",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    },
+    "./worker": {
+      "types": "./dist/modules/parser.worker.d.ts",
+      "import": "./dist/modules/parser.worker.mjs"
+    }
+  },
+  "files": [
+    "./dist",
+    "./package.json"
+  ],
   "scripts": {
     "dev": "tsc --watch",
-    "build": "tsc",
+    "build": "tsup",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
-    "test": "echo \"Testing parser...\""
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm run build"
   },
   "keywords": [
     "markdown",
-    "parser"
+    "parser",
+    "unified",
+    "remark",
+    "rehype",
+    "worker",
+    "multi-threaded",
+    "comlink"
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/vue-markdown-next.git",
+    "directory": "packages/parser"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/vue-markdown-next/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "dependencies": {
-    "@markdown-next/shared": "workspace:*"
-  }
+    "@markdown-next/shared": "workspace:*",
+    "@types/hast": "^3.0.4",
+    "comlink": "^4.4.2",
+    "rehype-mathjax": "^7.1.0",
+    "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "tsup": "^8.5.1",
+    "unified": "^11.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.3",
+    "vitest": "^4.0.16"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.5.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "sideEffects": false
 }
