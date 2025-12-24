@@ -5,26 +5,61 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc",
+    "dev": "tsup --watch",
+    "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.vue",
-    "lint:fix": "eslint src --ext .ts,.vue --fix",
-    "test": "echo \"Testing vue...\""
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "test": "echo \"Testing vue...\"",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm run build"
   },
   "keywords": [
     "vue",
+    "vue3",
     "markdown",
-    "components"
+    "markdown-renderer",
+    "components",
+    "worker",
+    "multi-threaded"
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/vue-markdown-next.git",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/vue-markdown-next/issues"
+  },
   "dependencies": {
     "@markdown-next/parser": "workspace:*",
     "@markdown-next/shared": "workspace:*"
   },
+  "devDependencies": {
+    "@types/node": "^22.19.3",
+    "tsup": "^8.5.1"
+  },
   "peerDependencies": {
     "vue": "^3.0.0"
-  }
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": false
+    }
+  },
+  "sideEffects": false
 }
