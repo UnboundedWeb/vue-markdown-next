@@ -1,21 +1,16 @@
-import {
-  defineComponent,
-  provide,
-  inject,
-  InjectionKey,
-  PropType,
-  onBeforeUnmount,
-} from 'vue';
+import { defineComponent, provide, inject, InjectionKey, PropType, onBeforeUnmount } from 'vue';
 import type { ParserOptions } from '@markdown-next/parser';
-import { createWorkerPool, ParserWorkerPool } from '@markdown-next/parser';
+import { createWorkerPool, ParserWorkerPool, type WorkerPoolOptions } from '@markdown-next/parser';
 
 /**
  * Worker Pool Context Injection Key
  */
-export const WorkerPoolContextKey: InjectionKey<{
+export type WorkerPoolContext = {
   pool: ParserWorkerPool;
   options: ParserOptions;
-}> = Symbol('WorkerPoolContext');
+};
+
+export const WorkerPoolContextKey: InjectionKey<WorkerPoolContext> = Symbol('WorkerPoolContext');
 
 /**
  * WorkerPoolProvider 组件
@@ -64,7 +59,7 @@ export const WorkerPoolProvider = defineComponent({
      * Remark 插件
      */
     remarkPlugins: {
-      type: Array as PropType<any[]>,
+      type: Array as PropType<ParserOptions['remarkPlugins']>,
       default: () => [],
     },
 
@@ -72,7 +67,7 @@ export const WorkerPoolProvider = defineComponent({
      * Rehype 插件
      */
     rehypePlugins: {
-      type: Array as PropType<any[]>,
+      type: Array as PropType<ParserOptions['rehypePlugins']>,
       default: () => [],
     },
 
@@ -80,7 +75,7 @@ export const WorkerPoolProvider = defineComponent({
      * MathJax 配置
      */
     mathJaxConfig: {
-      type: Object as PropType<any>,
+      type: Object as PropType<ParserOptions['mathJaxConfig']>,
       default: undefined,
     },
 
@@ -105,7 +100,7 @@ export const WorkerPoolProvider = defineComponent({
     };
 
     // 创建 Worker 池实例
-    const poolOptions: any = {
+    const poolOptions: WorkerPoolOptions = {
       ...options,
     };
     if (props.workerCount !== undefined) {
@@ -146,6 +141,6 @@ export const WorkerPoolProvider = defineComponent({
  * }
  * ```
  */
-export function useWorkerPoolContext() {
+export function useWorkerPoolContext(): WorkerPoolContext | null {
   return inject(WorkerPoolContextKey, null);
 }

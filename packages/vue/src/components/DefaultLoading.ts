@@ -44,7 +44,9 @@ export const DefaultLoading = defineComponent({
                 'stroke-dashoffset': '0',
                 'stroke-linecap': 'round',
               }),
-              h('style', `
+              h(
+                'style',
+                `
                 @keyframes markdown-spin {
                   0% {
                     transform: rotate(0deg);
@@ -53,7 +55,8 @@ export const DefaultLoading = defineComponent({
                     transform: rotate(360deg);
                   }
                 }
-              `),
+              `
+              ),
             ]
           ),
         ]

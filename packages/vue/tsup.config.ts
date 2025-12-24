@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: ['src/index.ts'],
-  format: ['esm', 'cjs'],
+  format: ['esm'],
   dts: {
     resolve: true,
     compilerOptions: {
@@ -11,11 +11,12 @@ export default defineConfig({
     },
   },
   clean: true,
-  sourcemap: true,
+  sourcemap: false,
   external: ['vue', '@markdown-next/parser', '@markdown-next/shared'],
   splitting: false,
   treeshake: true,
   outDir: 'dist',
+  outExtension: () => ({ js: '.js' }),
   target: 'es2020',
   platform: 'browser',
 });

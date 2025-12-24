@@ -15,8 +15,7 @@ export const DefaultError = defineComponent({
   },
 
   setup(props) {
-    const errorMessage =
-      typeof props.error === 'string' ? props.error : props.error.message;
+    const errorMessage = typeof props.error === 'string' ? props.error : props.error.message;
 
     return () =>
       h(

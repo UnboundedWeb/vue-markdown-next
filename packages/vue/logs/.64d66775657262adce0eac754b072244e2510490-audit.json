@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/litlesnow/Desktop/Project/vue-markdown-next/packages/vue/logs/.64d66775657262adce0eac754b072244e2510490-audit.json",
+    "files": [
+        {
+            "date": 1766594563674,
+            "name": "/Users/litlesnow/Desktop/Project/vue-markdown-next/packages/vue/logs/mcp-puppeteer-2025-12-25.log",
+            "hash": "d8ce9a4acb6d347cbbf1680a25e08358c3ea0f129c237d82ede736970bd94503"
+        }
+    ],
+    "hashType": "sha256"
+}

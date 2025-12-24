@@ -1,11 +1,5 @@
-import {
-  defineComponent,
-  ref,
-  watch,
-  PropType,
-  h,
-  Component,
-} from 'vue';
+import { defineComponent, ref, watch, PropType, h, Component } from 'vue';
+import type { VNode } from 'vue';
 import type { ParserOptions } from '@markdown-next/parser';
 import type { ComponentsMap } from '../types';
 import { useWorkerPoolContext } from './WorkerPoolProvider';
@@ -99,7 +93,7 @@ export const MarkdownRenderer = defineComponent({
      * Remark 插件（仅单线程模式）
      */
     remarkPlugins: {
-      type: Array as PropType<any[]>,
+      type: Array as PropType<ParserOptions['remarkPlugins']>,
       default: () => [],
     },
 
@@ -107,7 +101,7 @@ export const MarkdownRenderer = defineComponent({
      * Rehype 插件（仅单线程模式）
      */
     rehypePlugins: {
-      type: Array as PropType<any[]>,
+      type: Array as PropType<ParserOptions['rehypePlugins']>,
       default: () => [],
     },
 
@@ -115,7 +109,7 @@ export const MarkdownRenderer = defineComponent({
      * MathJax 配置（仅单线程模式）
      */
     mathJaxConfig: {
-      type: Object as PropType<any>,
+      type: Object as PropType<ParserOptions['mathJaxConfig']>,
       default: undefined,
     },
 
@@ -135,7 +129,7 @@ export const MarkdownRenderer = defineComponent({
     // 状态
     const loading = ref(false);
     const error = ref<Error | null>(null);
-    const vnode = ref<any>(null);
+    const vnode = ref<VNode | VNode[] | string | null>(null);
 
     // 如果不在 WorkerPoolProvider 内，创建单线程解析器
     let parser: ReturnType<typeof useParser> | null = null;
@@ -154,7 +148,7 @@ export const MarkdownRenderer = defineComponent({
     /**
      * 渲染 Markdown
      */
-    const render = async () => {
+    const render = async (): Promise<void> => {
       if (!props.content) {
         vnode.value = null;
         return;
@@ -180,7 +174,6 @@ export const MarkdownRenderer = defineComponent({
         vnode.value = hastToVNode(hast, props.components);
       } catch (err) {
         error.value = err as Error;
-        console.error('Markdown rendering error:', err);
       } finally {
         loading.value = false;
       }

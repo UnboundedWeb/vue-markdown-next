@@ -1,9 +1,5 @@
 import { ref, onBeforeUnmount } from 'vue';
-import {
-  ParserWorkerPool,
-  createWorkerPool,
-  type WorkerPoolOptions,
-} from '@markdown-next/parser';
+import { ParserWorkerPool, createWorkerPool, type WorkerPoolOptions } from '@markdown-next/parser';
 import type { Root } from 'hast';
 
 /**
@@ -13,27 +9,27 @@ export interface UseWorkerPoolReturn {
   /**
    * 解析 Markdown 到 HTML
    */
-  parseToHTML: (markdown: string) => Promise<string>;
+  parseToHTML: (_markdown: string) => Promise<string>;
 
   /**
    * 解析 Markdown 到 HAST
    */
-  parseToHAST: (markdown: string) => Promise<Root>;
+  parseToHAST: (_markdown: string) => Promise<Root>;
 
   /**
    * 批量解析 Markdown 到 HTML（并行）
    */
-  batchParseToHTML: (markdowns: string[]) => Promise<string[]>;
+  batchParseToHTML: (_markdowns: string[]) => Promise<string[]>;
 
   /**
    * 批量解析 Markdown 到 HAST（并行）
    */
-  batchParseToHAST: (markdowns: string[]) => Promise<Root[]>;
+  batchParseToHAST: (_markdowns: string[]) => Promise<Root[]>;
 
   /**
    * 更新所有 Worker 的选项
    */
-  updateOptions: (options: Partial<WorkerPoolOptions>) => Promise<void>;
+  updateOptions: (_options: Partial<WorkerPoolOptions>) => Promise<void>;
 
   /**
    * 获取 Worker 池信息
@@ -44,7 +40,6 @@ export interface UseWorkerPoolReturn {
     environment: 'browser' | 'node' | 'unknown';
     initialized: boolean;
   };
-
 }
 
 /**
@@ -91,7 +86,7 @@ export function useWorkerPool(options: WorkerPoolOptions = {}): UseWorkerPoolRet
     return pool.value.updateOptions(newOptions);
   };
 
-  const getPoolInfo = () => {
+  const getPoolInfo = (): ReturnType<ParserWorkerPool['getPoolInfo']> => {
     return pool.value.getPoolInfo();
   };
 

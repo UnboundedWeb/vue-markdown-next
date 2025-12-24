@@ -9,23 +9,22 @@ export interface UseParserReturn {
   /**
    * 解析 Markdown 到 HTML
    */
-  parseToHTML: (markdown: string) => Promise<string>;
+  parseToHTML: (_markdown: string) => Promise<string>;
 
   /**
    * 解析 Markdown 到 HAST
    */
-  parseToHAST: (markdown: string) => Promise<Root>;
+  parseToHAST: (_markdown: string) => Promise<Root>;
 
   /**
    * 批量解析 Markdown 到 HTML
    */
-  batchParseToHTML: (markdowns: string[]) => Promise<string[]>;
+  batchParseToHTML: (_markdowns: string[]) => Promise<string[]>;
 
   /**
    * 批量解析 Markdown 到 HAST
    */
-  batchParseToHAST: (markdowns: string[]) => Promise<Root[]>;
-
+  batchParseToHAST: (_markdowns: string[]) => Promise<Root[]>;
 }
 
 /**

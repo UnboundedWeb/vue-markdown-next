@@ -14,4 +14,9 @@ export { DefaultError } from './components/DefaultError';
 export type { ComponentsMap, MarkdownRendererProps, WorkerPoolContext } from './types';
 
 // Re-export types from parser
-export type { ParserOptions, WorkerPoolOptions, RenderType, ExtendsProps } from '@markdown-next/parser';
+export type {
+  ParserOptions,
+  WorkerPoolOptions,
+  RenderType,
+  ExtendsProps,
+} from '@markdown-next/parser';

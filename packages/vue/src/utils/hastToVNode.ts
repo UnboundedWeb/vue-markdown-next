@@ -1,5 +1,5 @@
-import { h, VNode, Component } from 'vue';
-import type { Root, Element, Text, Comment } from 'hast';
+import { h, VNode, Component, Comment } from 'vue';
+import type { Root, Element, Text, Comment as HastComment } from 'hast';
 import type { ComponentsMap } from '../types';
 
 /**
@@ -9,7 +9,10 @@ import type { ComponentsMap } from '../types';
  * @param components 自定义组件映射
  * @returns Vue VNode
  */
-export function hastToVNode(node: Root | Element | Text | Comment, components: ComponentsMap = {}): VNode | VNode[] | string {
+export function hastToVNode(
+  node: Root | Element | Text | HastComment,
+  components: ComponentsMap = {}
+): VNode | VNode[] | string {
   // 文本节点
   if (node.type === 'text') {
     return node.value;
@@ -36,10 +39,10 @@ export function hastToVNode(node: Root | Element | Text | Comment, components: C
     const props: Record<string, any> = {};
 
     // 处理 className -> class
-    if (properties.className) {
-      props.class = Array.isArray(properties.className)
-        ? properties.className.join(' ')
-        : properties.className;
+    if (properties['className']) {
+      props['class'] = Array.isArray(properties['className'])
+        ? properties['className'].join(' ')
+        : properties['className'];
     }
 
     // 处理其他属性
@@ -70,20 +73,17 @@ export function hastToVNode(node: Root | Element | Text | Comment, components: C
         return h(customComponent, props, vNodeChildren);
       }
 
-      // 如果是函数组件
-      if (typeof customComponent === 'function') {
-        // 传递原始节点和属性给自定义组件
-        return customComponent({
+      // 如果是 Vue 组件（包括函数组件）
+      return h(
+        customComponent as Component,
+        {
           node,
           ...props,
-          children: vNodeChildren,
-        });
-      }
-
-      // 如果是 Vue 组件
-      return h(customComponent as Component, props, {
-        default: () => vNodeChildren,
-      });
+        },
+        {
+          default: () => vNodeChildren,
+        }
+      );
     }
 
     // 默认渲染原始标签
