@@ -11,7 +11,7 @@
     "incremental": false,
     "baseUrl": ".",
     "paths": {
-      "@markdown-next/parser": ["../parser/dist/index.d.ts"]
+      "@markdown-next/parser": ["../parser/dist/index.d.mts"]
     }
   }
 }

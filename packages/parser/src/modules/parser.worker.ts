@@ -27,8 +27,9 @@ class ParserWorkerService {
    */
   async parseToHAST(markdown: string): Promise<Root> {
     const processor = getParser('hast', this.options);
-    const result = await processor.process(markdown);
-    return result.result as Root;
+    const tree = processor.parse(markdown);
+    const result = await processor.run(tree);
+    return result as Root;
   }
 
   /**
