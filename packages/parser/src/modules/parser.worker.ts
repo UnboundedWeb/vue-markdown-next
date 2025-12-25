@@ -1,6 +1,6 @@
 import { expose } from 'comlink';
 import { Root } from 'hast';
-import { getParser } from './core.worker';
+import { getParser } from './core';
 import type { ParserOptions } from './parser';
 
 /**

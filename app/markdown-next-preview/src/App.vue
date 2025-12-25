@@ -8,7 +8,7 @@ const markdown = ref(`# Markdown Next · Vue Preview
 
 ## 为什么选择 markdown-next
 - Vue 友好 支持自定义Vnode渲染节点，可拓展交互 / 样式
-- 解析与渲染分离，适合 worker
+- 解析与渲染分离。支持组件式线程池管理
 - 开箱即用，GitHub 风格主题直接可用
 - 无CSS文依赖
 - 默认支持数学公式渲染（worker内解析），支持Tex & Latex两种格式
