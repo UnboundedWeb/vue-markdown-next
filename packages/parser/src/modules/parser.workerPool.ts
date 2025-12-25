@@ -130,6 +130,8 @@ export class ParserWorkerPool {
     this.workerCount = options.workerCount
       ? Math.min(Math.max(1, options.workerCount), maxWorkers)
       : maxWorkers;
+    // 立即开始初始化 Worker 池
+    this.init();
   }
 
   /**
@@ -143,19 +145,21 @@ export class ParserWorkerPool {
     }
 
     this.initPromise = (async () => {
-      const workerPromises = Array.from({ length: this.workerCount }, async () => {
-        const worker = createWorker();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const WorkerClass = wrap<any>(worker) as any;
-        const parserOptions = { ...this.options };
-        delete (parserOptions as { workerCount?: number }).workerCount;
-        const proxy = await new WorkerClass(parserOptions);
+      const workerPromises = Array.from({ length: this.workerCount }, () => {
+        return (async () => {
+          const worker = createWorker();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const WorkerClass = wrap<any>(worker) as any;
+          const parserOptions = { ...this.options };
+          delete (parserOptions as { workerCount?: number }).workerCount;
+          const proxy = await new WorkerClass(parserOptions);
 
-        return {
-          worker,
-          proxy,
-          busy: false,
-        };
+          return {
+            worker,
+            proxy,
+            busy: false,
+          };
+        })();
       });
 
       this.workers = await Promise.all(workerPromises);
@@ -282,12 +286,16 @@ export class ParserWorkerPool {
    */
   getPoolInfo(): {
     workerCount: number;
+    activeWorkers: number;
+    busyWorkers: number;
     maxWorkers: number;
     environment: 'browser' | 'node' | 'unknown';
     initialized: boolean;
   } {
     return {
       workerCount: this.workerCount,
+      activeWorkers: this.workers.length,
+      busyWorkers: this.workers.filter((w) => w.busy).length,
       maxWorkers: getMaxWorkers(),
       environment: getEnvironment(),
       initialized: this.initialized,
