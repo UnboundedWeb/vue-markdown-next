@@ -20,8 +20,7 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
     },
     workerCount: {
       type: Number,
-      required: false,
-      default: 1,
+      required: true,
     },
     customTags: {
       type: Array as PropType<string[]>,

@@ -103,6 +103,7 @@ const prefixLine = (prefix: string) => {
           <div class="status">Live</div>
         </div>
         <MarkdownWorkerPoll
+          :worker-count="4"
           :parserOptions="{
             supportsLaTeX: true,
             extendedGrammar: ['gfm', 'mathjax'],
