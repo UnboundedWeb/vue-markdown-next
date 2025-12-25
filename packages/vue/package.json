@@ -1,40 +1,36 @@
 {
   "name": "@markdown-next/vue",
   "version": "1.0.0",
-  "description": "Vue components for markdown-next",
-  "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "description": "Vue renderer for markdown-next",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
-    "dist",
-    "package.json",
-    "README.md"
+    "./dist",
+    "./package.json",
+    "./README.md"
   ],
   "scripts": {
-    "dev": "tsup --watch",
-    "build": "tsup",
+    "dev": "vite",
+    "build": "vite build && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
-    "test": "echo \"Testing vue...\"",
-    "prettier": "prettier src --write",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "test": "vitest",
     "prepublishOnly": "npm run lint && npm run typecheck && npm run build"
   },
   "keywords": [
-    "vue",
-    "vue3",
     "markdown",
-    "markdown-renderer",
-    "components",
-    "worker",
-    "multi-threaded"
+    "vue",
+    "renderer",
+    "worker"
   ],
   "author": "",
   "license": "MIT",
@@ -46,21 +42,23 @@
   "bugs": {
     "url": "https://github.com/yourusername/vue-markdown-next/issues"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "@markdown-next/parser": "workspace:*",
-    "@markdown-next/shared": "workspace:*"
+    "hast-util-to-jsx-runtime": "^2.3.0"
   },
   "devDependencies": {
-    "@types/node": "^22.19.3",
-    "tsup": "^8.5.1"
+    "@types/hast": "^3.0.4",
+    "@types/node": "^25.0.3",
+    "@vitejs/plugin-vue-jsx": "^4.2.0",
+    "vite": "^5.4.10",
+    "vitest": "^4.0.16",
+    "vue": "^3.5.0"
   },
   "peerDependencies": {
-    "vue": "^3.0.0"
-  },
-  "peerDependenciesMeta": {
-    "vue": {
-      "optional": false
-    }
+    "vue": ">=3.2.0"
   },
   "sideEffects": false
 }

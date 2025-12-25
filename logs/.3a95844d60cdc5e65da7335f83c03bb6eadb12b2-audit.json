@@ -1,0 +1,20 @@
+{
+  "keep": {
+    "days": true,
+    "amount": 14
+  },
+  "auditLog": "/Users/litlesnow/Desktop/Project/vue-markdown-next/logs/.3a95844d60cdc5e65da7335f83c03bb6eadb12b2-audit.json",
+  "files": [
+    {
+      "date": 1766674026358,
+      "name": "/Users/litlesnow/Desktop/Project/vue-markdown-next/logs/mcp-puppeteer-2025-12-25.log",
+      "hash": "72e6c08bd51f205856fd4c17b6e0e2f35eee6a035bc07f28a345ddcb70c58c51"
+    },
+    {
+      "date": 1766679355807,
+      "name": "/Users/litlesnow/Desktop/Project/vue-markdown-next/logs/mcp-puppeteer-2025-12-26.log",
+      "hash": "097e49b6096d8d72b691380a3566cb3d65a2210da70c2f3764f14fabb30acd17"
+    }
+  ],
+  "hashType": "sha256"
+}

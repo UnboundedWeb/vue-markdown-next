@@ -4,15 +4,14 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "composite": true,
-    "jsx": "preserve",
-    "jsxImportSource": "vue",
     "baseUrl": ".",
     "paths": {
-      "@markdown-next/shared": ["../shared/src/index.ts"],
-      "@markdown-next/parser": ["../parser/src/index.ts"]
-    }
+      "@markdown-next/parser": ["../parser/src/index.ts"],
+      "@markdown-next/shared": ["../shared/src/index.ts"]
+    },
+    "jsxImportSource": "vue"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "../shared" }, { "path": "../parser" }]
+  "references": [{ "path": "../parser" }, { "path": "../shared" }]
 }
