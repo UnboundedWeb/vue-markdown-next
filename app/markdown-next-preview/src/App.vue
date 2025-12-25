@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue';
 import { MarkdownRenderer, MarkdownWorkerPoll } from '@markdown-next/vue';
-
+const countPoll = navigator.hardwareConcurrency;
 const markdown = ref(`# Markdown Next · Vue Preview
 
 欢迎来到 \`packages/vue\` 的测试页面。这一页用来验证渲染器的稳定性与实时反馈。
@@ -103,7 +103,7 @@ const prefixLine = (prefix: string) => {
           <div class="status">Live</div>
         </div>
         <MarkdownWorkerPoll
-          :worker-count="4"
+          :worker-count="countPoll"
           :parserOptions="{
             supportsLaTeX: true,
             extendedGrammar: ['gfm', 'mathjax'],
