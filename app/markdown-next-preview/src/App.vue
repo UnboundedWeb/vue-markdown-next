@@ -99,6 +99,7 @@ const prefixLine = (prefix: string) => {
           :parserOptions="{
             extendedGrammar: ['gfm', 'mathjax'],
           }"
+          :dynamic="true"
           class="preview"
           :markdown="markdown"
         />
