@@ -1,6 +1,4 @@
-import type { Root } from 'hast';
-import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
-import type { Components } from 'hast-util-to-jsx-runtime';
+import type { Element, Parent, Root, RootContent } from 'hast';
 import { Fragment, h } from 'vue';
 import type { CSSProperties, StyleValue, VNodeChild } from 'vue';
 import type { MarkdownComponents, MarkdownRenderOptions } from '../types';
@@ -158,15 +156,57 @@ const createJsx = (
   if (children == null) {
     return h(type as never, vnodeProps);
   }
-  return h(type as never, vnodeProps, children as NonNullableChild);
+  const componentProps = { ...vnodeProps, children };
+  return h(type as never, componentProps, children as NonNullableChild);
 };
 
+function renderChildren(node: Parent, components: MarkdownComponents): NonNullableChild[] {
+  const children: NonNullableChild[] = [];
+  for (let index = 0; index < node.children.length; index += 1) {
+    const child = renderNode(node.children[index] as RootContent, components, index);
+    if (child !== null && child !== undefined) {
+      children.push(child as NonNullableChild);
+    }
+  }
+  return children;
+}
+
+function renderNode(
+  node: Root | RootContent,
+  components: MarkdownComponents,
+  key?: number
+): VNodeChild | null {
+  switch (node.type) {
+    case 'root': {
+      const children = renderChildren(node, components);
+      if (!children.length) return null;
+      return createJsx(Fragment, { children }, undefined);
+    }
+    case 'element': {
+      const element = node as Element;
+      const component = components[element.tagName] ?? element.tagName;
+      const props = normalizeProps(
+        (element.properties ?? {}) as Record<string, unknown> | null | undefined
+      );
+      props['node'] = element;
+      const childSource =
+        element.tagName === 'template' && element.content ? element.content : element;
+      const children = renderChildren(childSource, components);
+      if (children.length) {
+        props['children'] = children;
+      }
+      return createJsx(component, props as Record<string, unknown>, key?.toString());
+    }
+    case 'text':
+      return node.value;
+    case 'comment':
+    case 'doctype':
+    default:
+      return null;
+  }
+}
+
 export function renderHastToVue(tree: Root, options?: MarkdownRenderOptions): VNodeChild {
-  return toJsxRuntime(tree, {
-    Fragment,
-    jsx: createJsx as unknown as never,
-    jsxs: createJsx as unknown as never,
-    passNode: true,
-    components: resolveComponents(options) as Partial<Components>,
-  }) as VNodeChild;
+  const components = resolveComponents(options);
+  return renderNode(tree, components) as VNodeChild;
 }
