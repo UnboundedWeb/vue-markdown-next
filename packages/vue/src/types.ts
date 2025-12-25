@@ -17,6 +17,7 @@ export interface MarkdownRendererProps extends MarkdownRenderOptions {
 }
 
 export interface MarkdownWorkerPollProps extends MarkdownRenderOptions {
+  parserOptions?: ParserOptions;
   workerCount?: number;
   customTags?: string[];
   extendedGrammar?: ParserOptions['extendedGrammar'];

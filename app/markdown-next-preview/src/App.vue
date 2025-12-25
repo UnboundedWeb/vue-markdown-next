@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue';
-import { MarkdownRenderer } from '@markdown-next/vue';
+import { MarkdownRenderer, MarkdownWorkerPoll } from '@markdown-next/vue';
 
 const markdown = ref(`# Markdown Next · Vue Preview
 
@@ -102,15 +102,14 @@ const prefixLine = (prefix: string) => {
           </div>
           <div class="status">Live</div>
         </div>
-        <MarkdownRenderer
+        <MarkdownWorkerPoll
           :parserOptions="{
             supportsLaTeX: true,
             extendedGrammar: ['gfm', 'mathjax'],
           }"
-          :dynamic="true"
-          class="preview"
-          :markdown="markdown"
-        />
+        >
+          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
+        </MarkdownWorkerPoll>
       </section>
     </main>
   </div>

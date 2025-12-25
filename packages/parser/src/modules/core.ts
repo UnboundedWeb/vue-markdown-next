@@ -11,6 +11,7 @@ import rehypeRaw from 'rehype-raw';
 import { createSanitizeSchema } from '../utils/createSanitizeSchema';
 import { rehypeConvertAbnormalTagsToText } from '../plugin/rehypeConvertAbnormalTagsToText';
 import rehypeMathJaxChtml from 'rehype-mathjax/chtml';
+import rehypeMathJaxSvg from 'rehype-mathjax/svg';
 import type { Options as MathJaxOptions } from 'rehype-mathjax/chtml';
 import { DEFAULT_MATHJAX_CONFIG } from '../consts/mathjaxdefaultConfig';
 import { remarkMathDelimiters } from '../plugin/remarkMathDelimiters';
@@ -77,7 +78,8 @@ export const getParser = <T extends RenderType>(
 
   if (extendedGrammarSet.has('mathjax')) {
     const mergedConfig: MathJaxOptions = mathJaxConfig ?? DEFAULT_MATHJAX_CONFIG;
-    parser = parser.use(rehypeMathJaxChtml, mergedConfig);
+    const hasDocument = typeof document !== 'undefined';
+    parser = parser.use(hasDocument ? rehypeMathJaxChtml : rehypeMathJaxSvg, mergedConfig);
   }
 
   // Append rehype plugins after rehypeRaw/rehypeSanitize

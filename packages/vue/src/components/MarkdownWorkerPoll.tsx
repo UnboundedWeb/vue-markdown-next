@@ -1,7 +1,7 @@
 import { defineComponent, onBeforeUnmount, provide, computed } from 'vue';
 import type { DefineComponent, PropType } from 'vue';
 import type { ParserOptions } from '@markdown-next/parser';
-import { ParserWorkerPool } from '@markdown-next/parser';
+import { createWorkerPool } from '@markdown-next/parser';
 import { markdownWorkerContextKey } from '../context';
 import type {
   MarkdownComponent,
@@ -13,10 +13,15 @@ import type {
 export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defineComponent({
   name: 'MarkdownWorkerPoll',
   props: {
+    parserOptions: {
+      type: Object as PropType<ParserOptions>,
+      required: false,
+      default: undefined,
+    },
     workerCount: {
       type: Number,
       required: false,
-      default: undefined,
+      default: 1,
     },
     customTags: {
       type: Array as PropType<string[]>,
@@ -70,7 +75,9 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
     },
   },
   setup(props, { slots }) {
-    const poolOptions: ParserOptions & { workerCount?: number } = {};
+    const poolOptions: ParserOptions & { workerCount?: number } = {
+      ...(props.parserOptions ?? {}),
+    };
     if (props.workerCount != null) poolOptions.workerCount = props.workerCount;
     if (props.customTags) poolOptions.customTags = props.customTags;
     if (props.extendedGrammar) poolOptions.extendedGrammar = props.extendedGrammar;
@@ -79,7 +86,7 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
     if (props.mathJaxConfig) poolOptions.mathJaxConfig = props.mathJaxConfig;
     if (props.supportsLaTeX != null) poolOptions.supportsLaTeX = props.supportsLaTeX;
 
-    const pool = new ParserWorkerPool(poolOptions);
+    const pool = createWorkerPool(poolOptions);
 
     const renderOptions = computed<MarkdownRenderOptions | undefined>(() => {
       if (

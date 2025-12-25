@@ -71,7 +71,7 @@ function createWorker(): Worker {
 
   if (env === 'browser') {
     // 浏览器环境：使用 Web Worker
-    return new Worker(new URL('./parser.worker.ts', import.meta.url), {
+    return new Worker(new URL('./modules/parser.worker.mjs', import.meta.url), {
       type: 'module',
     });
   }
@@ -81,7 +81,7 @@ function createWorker(): Worker {
     try {
       // eslint-disable-next-line no-undef
       const { Worker } = require('worker_threads');
-      return new Worker(new URL('./parser.worker.ts', import.meta.url));
+      return new Worker(new URL('./modules/parser.worker.mjs', import.meta.url));
     } catch {
       throw new Error(
         'Worker threads are not supported in this Node.js environment. ' +
@@ -120,6 +120,9 @@ export class ParserWorkerPool {
   private workers: WorkerState[] = [];
   private workerCount: number;
   private initialized = false;
+  private initPromise: Promise<void> | null = null;
+  // eslint-disable-next-line no-unused-vars
+  private pending: Array<(worker: WorkerState) => void> = [];
 
   constructor(options: WorkerPoolOptions = {}) {
     this.options = options;
@@ -134,24 +137,36 @@ export class ParserWorkerPool {
    */
   private async init(): Promise<void> {
     if (this.initialized) return;
+    if (this.initPromise) {
+      await this.initPromise;
+      return;
+    }
 
-    const workerPromises = Array.from({ length: this.workerCount }, async () => {
-      const worker = createWorker();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const WorkerClass = wrap<any>(worker) as any;
-      const parserOptions = { ...this.options };
-      delete (parserOptions as { workerCount?: number }).workerCount;
-      const proxy = await new WorkerClass(parserOptions);
+    this.initPromise = (async () => {
+      const workerPromises = Array.from({ length: this.workerCount }, async () => {
+        const worker = createWorker();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const WorkerClass = wrap<any>(worker) as any;
+        const parserOptions = { ...this.options };
+        delete (parserOptions as { workerCount?: number }).workerCount;
+        const proxy = await new WorkerClass(parserOptions);
 
-      return {
-        worker,
-        proxy,
-        busy: false,
-      };
-    });
+        return {
+          worker,
+          proxy,
+          busy: false,
+        };
+      });
 
-    this.workers = await Promise.all(workerPromises);
-    this.initialized = true;
+      this.workers = await Promise.all(workerPromises);
+      this.initialized = true;
+    })();
+
+    try {
+      await this.initPromise;
+    } finally {
+      this.initPromise = null;
+    }
   }
 
   /**
@@ -163,23 +178,14 @@ export class ParserWorkerPool {
     // 查找空闲的 Worker
     let worker = this.workers.find((w) => !w.busy);
 
-    // 如果所有 Worker 都忙，等待第一个空闲
+    // 如果所有 Worker 都忙，排队等待释放
     if (!worker) {
-      await new Promise<void>((resolve) => {
-        // eslint-disable-next-line no-undef
-        const checkInterval = setInterval(() => {
-          worker = this.workers.find((w) => !w.busy);
-          if (worker) {
-            // eslint-disable-next-line no-undef
-            clearInterval(checkInterval);
-            resolve();
-          }
-        }, 10);
+      return await new Promise<WorkerState>((resolve) => {
+        this.pending.push((available) => {
+          available.busy = true;
+          resolve(available);
+        });
       });
-    }
-
-    if (!worker) {
-      throw new Error('No available worker');
     }
 
     worker.busy = true;
@@ -190,6 +196,11 @@ export class ParserWorkerPool {
    * 释放 Worker
    */
   private releaseWorker(worker: WorkerState): void {
+    const next = this.pending.shift();
+    if (next) {
+      next(worker);
+      return;
+    }
     worker.busy = false;
   }
 
