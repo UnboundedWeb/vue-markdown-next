@@ -7,9 +7,16 @@ const markdown = ref(`# Markdown Next · Vue Preview
 欢迎来到 \`packages/vue\` 的测试页面。这一页用来验证渲染器的稳定性与实时反馈。
 
 ## 为什么选择 markdown-next
-- Vue 友好渲染（组件可扩展）
+- Vue 友好 支持自定义Vnode渲染节点，可拓展交互 / 样式
 - 解析与渲染分离，适合 worker
-- GitHub 风格主题直接可用
+- 开箱即用，GitHub 风格主题直接可用
+- 无CSS文依赖
+- 默认支持数学公式渲染（worker内解析），支持Tex & Latex两种格式
+- 默认支持gfm拓展markdown语法
+- 默认安全：HTML 会先被解析，但最终只保留白名单允许的标签/属性，其它都会被过滤。
+- 可自定义：通过 customTags 加入自定义标签名单，白名单内的标签会被正常渲染。
+
+$ 10=y^2 $
 
 ## 示例代码
 \`\`\`ts
@@ -97,6 +104,7 @@ const prefixLine = (prefix: string) => {
         </div>
         <MarkdownRenderer
           :parserOptions="{
+            supportsLaTeX: true,
             extendedGrammar: ['gfm', 'mathjax'],
           }"
           :dynamic="true"
