@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue';
-import { MarkdownRenderer, MarkdownWorkerPoll } from '@markdown-next/vue';
-const countPoll = navigator.hardwareConcurrency;
+import { ref } from 'vue';
+import EditorPane from './components/EditorPane.vue';
+import LivePreviewPane from './components/LivePreviewPane.vue';
+import CustomPreviewPane from './components/CustomPreviewPane.vue';
+const countPoll = 1;
 const markdown = ref(`# Markdown Next · Vue Preview
 
 欢迎来到 \`packages/vue\` 的测试页面。这一页用来验证渲染器的稳定性与实时反馈。
@@ -25,38 +27,6 @@ import { MarkdownRenderer } from '@markdown-next/vue';
 
 > 左侧编辑，右侧立即渲染。试着修改标题或列表。
 `);
-
-const editorRef = ref<HTMLTextAreaElement | null>(null);
-
-const wrapSelection = (before: string, after = before) => {
-  const textarea = editorRef.value;
-  if (!textarea) return;
-  const { selectionStart, selectionEnd } = textarea;
-  const value = markdown.value;
-  const selected = value.slice(selectionStart, selectionEnd);
-  markdown.value =
-    value.slice(0, selectionStart) + before + selected + after + value.slice(selectionEnd);
-
-  nextTick(() => {
-    textarea.focus();
-    textarea.setSelectionRange(selectionStart + before.length, selectionEnd + before.length);
-  });
-};
-
-const prefixLine = (prefix: string) => {
-  const textarea = editorRef.value;
-  if (!textarea) return;
-  const value = markdown.value;
-  const { selectionStart } = textarea;
-  const lineStart = value.lastIndexOf('\n', selectionStart - 1) + 1;
-  markdown.value = value.slice(0, lineStart) + prefix + value.slice(lineStart);
-
-  nextTick(() => {
-    const cursor = selectionStart + prefix.length;
-    textarea.focus();
-    textarea.setSelectionRange(cursor, cursor);
-  });
-};
 </script>
 
 <template>
@@ -71,63 +41,14 @@ const prefixLine = (prefix: string) => {
     </header>
 
     <main class="workspace">
-      <section class="pane editor-pane">
-        <div class="pane-header">
-          <div>
-            <h2>Markdown 编辑器</h2>
-            <p>轻量自定义编辑器，保持输入响应迅速。</p>
-          </div>
-          <div class="toolbar">
-            <button type="button" @click="wrapSelection('**')">Bold</button>
-            <button type="button" @click="wrapSelection('*')">Italic</button>
-            <button type="button" @click="wrapSelection('`')">Code</button>
-            <button type="button" @click="prefixLine('# ')">H1</button>
-            <button type="button" @click="prefixLine('- ')">List</button>
-          </div>
-        </div>
-        <textarea
-          ref="editorRef"
-          v-model="markdown"
-          class="editor"
-          spellcheck="false"
-          placeholder="在这里输入 markdown..."
-        />
-      </section>
-
-      <section class="pane preview-pane">
-        <div class="pane-header">
-          <div>
-            <h2>实时渲染</h2>
-            <p>由 @markdown-next/vue 渲染，带 GitHub 风格主题。</p>
-          </div>
-          <div class="status">Live</div>
-        </div>
-        <MarkdownWorkerPoll
-          :worker-count="countPoll"
-          :parserOptions="{
-            supportsLaTeX: true,
-            extendedGrammar: ['gfm', 'mathjax'],
-          }"
-        >
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-          <MarkdownRenderer :dynamic="true" class="preview" :markdown="markdown" />
-        </MarkdownWorkerPoll>
-      </section>
+      <EditorPane v-model="markdown" />
+      <LivePreviewPane :markdown="markdown" :worker-count="countPoll" />
+      <CustomPreviewPane :markdown="markdown" :worker-count="countPoll" />
     </main>
   </div>
 </template>
 
-<style scoped>
+<style>
 .page {
   display: flex;
   flex-direction: column;
@@ -263,6 +184,39 @@ h1 {
   padding: 12px 6px 0;
   overflow: auto;
   background: transparent;
+}
+
+.custom-preview-pane {
+  grid-column: 1 / -1;
+}
+
+.preview-custom {
+  padding: 12px 16px 0;
+}
+
+.preview-custom h2.custom-title {
+  margin-top: 28px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid rgba(247, 163, 70, 0.35);
+  color: #6b3a0b;
+  letter-spacing: 0.02em;
+}
+
+.preview-custom blockquote.custom-quote {
+  margin: 18px 0;
+  padding: 12px 18px;
+  border-left: 4px solid #f2a357;
+  background: linear-gradient(90deg, rgba(255, 239, 219, 0.7), rgba(255, 255, 255, 0.9));
+  color: #5a3a1a;
+  font-style: italic;
+}
+
+.preview-custom pre {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f6f8fa;
+  border: 1px solid rgba(27, 31, 36, 0.08);
+  overflow: auto;
 }
 
 .status {
