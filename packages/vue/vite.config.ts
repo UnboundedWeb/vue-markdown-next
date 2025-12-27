@@ -8,6 +8,10 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [vueJsx()],
+  resolve: {
+    // Prefer worker condition to avoid DOM-only exports in web workers.
+    conditions: ['worker', 'browser', 'module', 'import', 'default'],
+  },
   sourceMap: false,
   build: {
     sourcemap: false,
