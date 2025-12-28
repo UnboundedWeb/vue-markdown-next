@@ -1,6 +1,6 @@
 {
   "name": "markdown-next",
-  "version": "1.0.0",
+  "version": "0.0.1-alpha",
   "private": true,
   "description": "Vue markdown monorepo",
   "scripts": {
