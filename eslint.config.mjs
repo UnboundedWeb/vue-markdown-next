@@ -3,9 +3,38 @@ import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import prettierConfig from 'eslint-config-prettier';
 import prettierPlugin from 'eslint-plugin-prettier';
+import vue from 'eslint-plugin-vue';
+import vueParser from 'vue-eslint-parser';
 
 export default [
   js.configs.recommended,
+
+  // Vue file config
+  {
+    files: ['**/*.vue'],
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: {
+        parser: tsParser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      vue,
+      '@typescript-eslint': tsPlugin,
+      'prettier': prettierPlugin,
+    },
+    rules: {
+      'no-undef': 'off',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      }],
+      'prettier/prettier': 'error',
+    },
+  },
 
   // TypeScript file config
   {
@@ -51,6 +80,7 @@ export default [
     ignores: [
       '**/node_modules/**',
       '**/dist/**',
+      '**/*.d.ts',
       '**/.husky/**',
       '**/pnpm-lock.yaml',
       '**/__tests__/**',

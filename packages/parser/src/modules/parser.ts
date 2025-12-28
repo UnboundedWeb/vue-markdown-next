@@ -30,8 +30,9 @@ export class Parser {
    */
   async parseToHAST(markdown: string): Promise<Root> {
     const processor = getParser('hast', this.options);
-    const result = await processor.process(markdown);
-    return result.result as Root;
+    const tree = processor.parse(markdown);
+    const result = await processor.run(tree);
+    return result as Root;
   }
 
   /**
@@ -58,8 +59,9 @@ export class Parser {
     const processor = getParser('hast', this.options);
     return Promise.all(
       markdowns.map(async (md) => {
-        const result = await processor.process(md);
-        return result.result as Root;
+        const tree = processor.parse(md);
+        const result = await processor.run(tree);
+        return result as Root;
       })
     );
   }

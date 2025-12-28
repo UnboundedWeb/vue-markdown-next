@@ -1,6 +1,6 @@
 {
   "name": "@markdown-next/parser",
-  "version": "1.0.0",
+  "version": "0.0.1-alpha",
   "description": "Markdown parser for markdown-next with single-threaded and multi-threaded support",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -9,10 +9,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs"
-    },
-    "./worker": {
-      "types": "./dist/modules/parser.worker.d.ts",
-      "import": "./dist/modules/parser.worker.mjs"
     }
   },
   "files": [

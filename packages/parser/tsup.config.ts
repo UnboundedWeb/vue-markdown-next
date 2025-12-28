@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   dts: true,
   clean: true,
-  entry: ['src/index.ts'],
+  entry: ['src/index.ts', 'src/modules/parser.worker.ts'],
   format: ['esm'],
   outDir: 'dist',
   target: 'es2020',

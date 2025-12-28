@@ -1,30 +1,63 @@
 {
   "name": "@markdown-next/vue",
-  "version": "1.0.0",
-  "description": "Vue components for markdown-next",
-  "main": "dist/index.js",
+  "version": "0.0.1-alpha",
+  "type": "module",
+  "description": "Vue renderer for markdown-next",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "./dist",
+    "./package.json",
+    "./README.md"
+  ],
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.vue",
-    "lint:fix": "eslint src --ext .ts,.vue --fix",
-    "test": "echo \"Testing vue...\""
+    "dev": "vite",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -b",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "test": "vitest",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm run build"
   },
   "keywords": [
-    "vue",
     "markdown",
-    "components"
+    "vue",
+    "renderer",
+    "worker"
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/vue-markdown-next.git",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/vue-markdown-next/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "@markdown-next/parser": "workspace:*",
-    "@markdown-next/shared": "workspace:*"
+    "hast-util-to-jsx-runtime": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/hast": "^3.0.4",
+    "@types/node": "^25.0.3",
+    "@vitejs/plugin-vue-jsx": "^4.2.0",
+    "vite": "^5.4.10",
+    "vitest": "^4.0.16",
+    "vue": "^3.5.0"
   },
   "peerDependencies": {
-    "vue": "^3.0.0"
-  }
+    "vue": ">=3.2.0"
+  },
+  "sideEffects": false
 }
