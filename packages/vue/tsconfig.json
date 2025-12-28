@@ -6,12 +6,11 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@markdown-next/parser": ["../parser/src/index.ts"],
-      "@markdown-next/shared": ["../shared/src/index.ts"]
+      "@markdown-next/parser": ["../parser/dist/index.d.mts"]
     },
     "jsxImportSource": "vue"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "../parser" }, { "path": "../shared" }]
+  "references": []
 }

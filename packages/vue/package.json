@@ -1,6 +1,6 @@
 {
   "name": "@markdown-next/vue",
-  "version": "0.0.1-alpha",
+  "version": "0.0.2-alpha",
   "type": "module",
   "description": "Vue renderer for markdown-next",
   "module": "dist/index.mjs",

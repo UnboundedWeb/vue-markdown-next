@@ -32,7 +32,6 @@
 
     "baseUrl": ".",
     "paths": {
-      "@markdown-next/shared": ["packages/shared/src/index.ts"],
       "@markdown-next/parser": ["packages/parser/src/index.ts"],
       "@markdown-next/vue": ["packages/vue/src/index.ts"]
     }
