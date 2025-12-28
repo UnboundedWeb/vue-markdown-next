@@ -119,6 +119,11 @@ describe('getParser 输出示例', () => {
       expect(String(file)).toContain('<mjx-container');
     });
 
+    it('默认使用 CHTML 输出', async () => {
+      const file = await parser.process('$ 10=y^2 $');
+      expect(String(file)).toContain('jax="CHTML"');
+    });
+
     it('支持 \\[...\\] 块级语法', async () => {
       const file = await parser.process('\\[\\frac{1}{2}\\]');
       expect(String(file)).toContain('display="true"');
