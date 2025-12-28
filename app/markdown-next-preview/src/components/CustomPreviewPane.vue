@@ -2,11 +2,14 @@
 import { MarkdownRenderer, MarkdownWorkerPoll } from '@markdown-next/vue';
 import type { ParserOptions } from '@markdown-next/parser';
 import { CustomCodeRenderer, customComponents } from './customRenderers';
+import { useI18n } from 'vue-i18n';
 
 defineProps<{
   markdown: string;
   workerCount: number;
 }>();
+
+const { t } = useI18n();
 
 const parserOptions: ParserOptions = {
   supportsLaTeX: true,
@@ -18,10 +21,10 @@ const parserOptions: ParserOptions = {
   <section class="pane preview-pane custom-preview-pane">
     <div class="pane-header">
       <div>
-        <h2>自定义渲染样式</h2>
-        <p>自定义组件 + Highlight.js 代码高亮。</p>
+        <h2>{{ t('customPreview.title') }}</h2>
+        <p>{{ t('customPreview.description') }}</p>
       </div>
-      <div class="status">Custom</div>
+      <div class="status">{{ t('status.custom') }}</div>
     </div>
     <MarkdownWorkerPoll
       :worker-count="workerCount"

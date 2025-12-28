@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
   modelValue: string;
@@ -8,6 +9,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:modelValue', value: string): void;
 }>();
+
+const { t } = useI18n();
 
 const markdownValue = computed({
   get: () => props.modelValue,
@@ -51,15 +54,15 @@ const prefixLine = (prefix: string) => {
   <section class="pane editor-pane">
     <div class="pane-header">
       <div>
-        <h2>Markdown 编辑器</h2>
-        <p>轻量自定义编辑器，保持输入响应迅速。</p>
+        <h2>{{ t('editor.title') }}</h2>
+        <p>{{ t('editor.description') }}</p>
       </div>
       <div class="toolbar">
-        <button type="button" @click="wrapSelection('**')">Bold</button>
-        <button type="button" @click="wrapSelection('*')">Italic</button>
-        <button type="button" @click="wrapSelection('`')">Code</button>
-        <button type="button" @click="prefixLine('# ')">H1</button>
-        <button type="button" @click="prefixLine('- ')">List</button>
+        <button type="button" @click="wrapSelection('**')">{{ t('toolbar.bold') }}</button>
+        <button type="button" @click="wrapSelection('*')">{{ t('toolbar.italic') }}</button>
+        <button type="button" @click="wrapSelection('`')">{{ t('toolbar.code') }}</button>
+        <button type="button" @click="prefixLine('# ')">{{ t('toolbar.h1') }}</button>
+        <button type="button" @click="prefixLine('- ')">{{ t('toolbar.list') }}</button>
       </div>
     </div>
     <textarea
@@ -67,7 +70,7 @@ const prefixLine = (prefix: string) => {
       v-model="markdownValue"
       class="editor"
       spellcheck="false"
-      placeholder="在这里输入 markdown..."
+      :placeholder="t('editor.placeholder')"
     />
   </section>
 </template>

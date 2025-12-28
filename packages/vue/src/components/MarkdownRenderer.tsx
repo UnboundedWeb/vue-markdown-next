@@ -152,9 +152,10 @@ export const MarkdownRenderer = defineComponent({
     return () => {
       const error = renderError.value ?? renderState.error.value;
       const content = renderState.content.value as VNodeChild | null;
+      const showLoading = renderState.loading.value && !content && !error;
       return (
         <div {...rootAttrs.value} style={rootStyle.value}>
-          {error ? renderErrorNotice(error) : renderState.loading.value ? renderLoading() : content}
+          {error ? renderErrorNotice(error) : showLoading ? renderLoading() : content}
         </div>
       );
     };

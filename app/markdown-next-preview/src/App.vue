@@ -1,43 +1,60 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import EditorPane from './components/EditorPane.vue';
 import LivePreviewPane from './components/LivePreviewPane.vue';
 import CustomPreviewPane from './components/CustomPreviewPane.vue';
+import { markdownSamples, type Locale } from './i18n';
+
+const { t, locale } = useI18n();
 const countPoll = 1;
-const markdown = ref(`# Markdown Next · Vue Preview
+const markdown = ref(markdownSamples[locale.value as Locale]);
+const currentLocale = computed(() => locale.value as Locale);
 
-欢迎来到 \`packages/vue\` 的测试页面。这一页用来验证渲染器的稳定性与实时反馈。
+const localeOptions = computed(() => [
+  { value: 'zh', label: t('language.zh') },
+  { value: 'en', label: t('language.en') },
+]);
 
-## 为什么选择 markdown-next
-- Vue 友好 支持自定义Vnode渲染节点，可拓展交互 / 样式
-- 解析与渲染分离。支持组件式线程池管理
-- 开箱即用，GitHub 风格主题直接可用
-- 无CSS文依赖
-- 默认支持数学公式渲染（worker内解析），支持Tex & Latex两种格式
-- 默认支持gfm拓展markdown语法
-- 默认安全：HTML 会先被解析，但最终只保留白名单允许的标签/属性，其它都会被过滤。
-- 可自定义：通过 customTags 加入自定义标签名单，白名单内的标签会被正常渲染。
+watch(locale, (next, prev) => {
+  const prevSample = markdownSamples[prev as Locale];
+  if (markdown.value === prevSample) {
+    markdown.value = markdownSamples[next as Locale];
+  }
+});
 
-$ 10=y^2 $
-
-## 示例代码
-\`\`\`ts
-import { MarkdownRenderer } from '@markdown-next/vue';
-\`\`\`
-
-> 左侧编辑，右侧立即渲染。试着修改标题或列表。
-`);
+const setLocale = (value: Locale) => {
+  locale.value = value;
+};
 </script>
 
 <template>
   <div class="page">
     <header class="hero">
       <div>
-        <p class="eyebrow">packages/vue · playground</p>
-        <h1>Markdown Next Preview</h1>
-        <p class="subtitle">左侧编辑，右侧使用 @markdown-next/vue 渲染结果。</p>
+        <p class="eyebrow">{{ t('app.eyebrow') }}</p>
+        <h1>{{ t('app.title') }}</h1>
+        <p class="subtitle">{{ t('app.subtitle') }}</p>
       </div>
-      <div class="badge">Test Suite</div>
+      <div class="hero-actions">
+        <div class="language-switch">
+          <span class="language-label">{{ t('language.label') }}</span>
+          <div class="language-buttons">
+            <button
+              v-for="option in localeOptions"
+              :key="option.value"
+              type="button"
+              class="language-button"
+              :class="{ active: currentLocale === option.value }"
+              :aria-pressed="currentLocale === option.value"
+              @click="setLocale(option.value as Locale)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+        <div class="badge">{{ t('app.badge') }}</div>
+      </div>
     </header>
 
     <main class="workspace">
@@ -68,6 +85,12 @@ import { MarkdownRenderer } from '@markdown-next/vue';
   border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
+.hero-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   text-transform: uppercase;
@@ -89,6 +112,51 @@ h1 {
   color: #4a3120;
   font-size: 16px;
   line-height: 1.6;
+}
+
+.language-switch {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 248, 236, 0.85);
+  border: 1px solid rgba(124, 63, 0, 0.15);
+}
+
+.language-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #7c3f00;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.language-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.language-button {
+  border: 1px solid rgba(28, 18, 8, 0.2);
+  background: #fffdf8;
+  color: #5c3a1c;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.language-button:hover {
+  background: #fce6c8;
+}
+
+.language-button.active {
+  background: #1b120a;
+  color: #fff1dc;
+  border-color: #1b120a;
 }
 
 .badge {
@@ -233,6 +301,12 @@ h1 {
 @media (max-width: 1024px) {
   .hero {
     flex-direction: column;
+  }
+
+  .hero-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   .workspace {
