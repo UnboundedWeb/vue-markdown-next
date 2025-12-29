@@ -65,6 +65,13 @@ const markdown = ref(`
 $$
 \\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
 $$
+
+Latex行内公式：\(E = mc^2\)
+
+Latex块级公式：
+\[
+\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
+\]
 `);
 
 const parserOptions: ParserOptions = {

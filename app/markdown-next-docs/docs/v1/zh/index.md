@@ -11,7 +11,7 @@ hero:
       link: /v1/zh/guide/getting-started
     - theme: alt
       text: 在 GitHub 查看
-      link: https://github.com/yourusername/vue-markdown-next
+      link: https://github.com/UnboundedWeb/vue-markdown-next
 
 features:
   - icon: ⚡️

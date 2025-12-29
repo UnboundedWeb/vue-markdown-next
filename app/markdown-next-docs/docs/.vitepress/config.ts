@@ -41,6 +41,7 @@ const sharedSidebar: DefaultTheme.Sidebar = {
         { text: 'Basic Usage', link: '/examples/basic' },
         { text: 'Custom Components', link: '/examples/custom-components' },
         { text: 'Worker Pool', link: '/examples/worker-pool' },
+        { text: 'Math Formulas', link: '/examples/math' },
       ],
     },
   ],
@@ -51,6 +52,9 @@ export default defineConfig({
   title: 'Markdown Next',
   description: 'High-performance markdown parser and Vue renderer',
   base: '/',
+
+  // Set favicon
+  head: [['link', { rel: 'icon', type: 'image/png', href: '/logo.png' }]],
 
   // Multi-language support
   locales: {
@@ -90,12 +94,12 @@ export default defineConfig({
         ),
         editLink: {
           pattern:
-            'https://github.com/yourusername/vue-markdown-next/edit/main/app/markdown-next-docs/docs/:path',
+            'https://github.com/UnboundedWeb/vue-markdown-next/edit/main/app/markdown-next-docs/docs/:path',
           text: 'Edit this page on GitHub',
         },
         footer: {
           message: 'Released under the MIT License.',
-          copyright: 'Copyright © 2024-present',
+          copyright: 'Copyright © 2025-present',
         },
       },
     },
@@ -151,18 +155,19 @@ export default defineConfig({
                 { text: '基础用法', link: '/v1/zh/examples/basic' },
                 { text: '自定义组件', link: '/v1/zh/examples/custom-components' },
                 { text: 'Worker 池', link: '/v1/zh/examples/worker-pool' },
+                { text: '数学公式', link: '/v1/zh/examples/math' },
               ],
             },
           ],
         },
         editLink: {
           pattern:
-            'https://github.com/yourusername/vue-markdown-next/edit/main/app/markdown-next-docs/docs/:path',
+            'https://github.com/UnboundedWeb/vue-markdown-next/edit/main/app/markdown-next-docs/docs/:path',
           text: '在 GitHub 上编辑此页',
         },
         footer: {
           message: '基于 MIT 许可发布',
-          copyright: '版权所有 © 2024-至今',
+          copyright: '版权所有 © 2025-至今',
         },
         outline: {
           label: '页面导航',
@@ -184,11 +189,11 @@ export default defineConfig({
   },
 
   themeConfig: {
-    logo: '/logo.svg',
+    logo: '/logo.png',
     search: {
       provider: 'local',
     },
-    socialLinks: [{ icon: 'github', link: 'https://github.com/yourusername/vue-markdown-next' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/UnboundedWeb/vue-markdown-next' }],
   },
 
   markdown: {

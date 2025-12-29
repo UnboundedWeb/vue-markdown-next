@@ -1,5 +1,242 @@
 # 数学公式渲染
 
+<script setup>
+import { ref } from 'vue';
+
+// 基础示例
+const mathBasic = ref(`## 数学常数
+
+在数学中，有许多重要的常数。例如：
+
+- 圆周率 $\\pi \\approx 3.14159$
+- 自然对数的底 $e \\approx 2.71828$
+- 黄金比例 $\\varphi = \\frac{1+\\sqrt{5}}{2}$
+
+### 著名公式
+
+欧拉公式被认为是最美的数学公式之一：
+
+$$
+e^{i\\pi} + 1 = 0
+$$
+
+这个公式将五个最重要的数学常数联系在一起。`);
+
+// 矩阵示例
+const mathMatrix = ref(`# 线性代数中的矩阵
+
+## 基本矩阵
+
+一个 $2 \\times 2$ 矩阵：
+
+$$
+A = \\begin{pmatrix}
+a & b \\\\
+c & d
+\\end{pmatrix}
+$$
+
+## 单位矩阵
+
+$3 \\times 3$ 单位矩阵 $I_3$：
+
+$$
+I_3 = \\begin{pmatrix}
+1 & 0 & 0 \\\\
+0 & 1 & 0 \\\\
+0 & 0 & 1
+\\end{pmatrix}
+$$
+
+## 行列式
+
+矩阵 $A$ 的行列式：
+
+$$
+\\det(A) = \\begin{vmatrix}
+a & b \\\\
+c & d
+\\end{vmatrix} = ad - bc
+$$`);
+
+// 多行对齐公式示例
+const mathAligned = ref(`# 二次方程推导
+
+将二次方程 $ax^2 + bx + c = 0$ 配方：
+
+$$
+\\begin{aligned}
+ax^2 + bx + c &= 0 \\\\
+x^2 + \\frac{b}{a}x + \\frac{c}{a} &= 0 \\\\
+x^2 + \\frac{b}{a}x &= -\\frac{c}{a} \\\\
+x^2 + \\frac{b}{a}x + \\frac{b^2}{4a^2} &= \\frac{b^2}{4a^2} - \\frac{c}{a} \\\\
+\\left(x + \\frac{b}{2a}\\right)^2 &= \\frac{b^2 - 4ac}{4a^2} \\\\
+x + \\frac{b}{2a} &= \\pm\\frac{\\sqrt{b^2-4ac}}{2a} \\\\
+x &= \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}
+\\end{aligned}
+$$
+
+这就是著名的**求根公式**。`);
+
+// 分段函数示例
+const mathPiecewise = ref(`# 分段函数
+
+## 绝对值函数
+
+绝对值函数可以定义为：
+
+$$
+|x| = \\begin{cases}
+x & \\text{如果 } x \\geq 0 \\\\
+-x & \\text{如果 } x < 0
+\\end{cases}
+$$
+
+## 符号函数
+
+符号函数 $\\text{sgn}(x)$ 的定义：
+
+$$
+\\text{sgn}(x) = \\begin{cases}
+1 & \\text{如果 } x > 0 \\\\
+0 & \\text{如果 } x = 0 \\\\
+-1 & \\text{如果 } x < 0
+\\end{cases}
+$$
+
+## 单位阶跃函数
+
+Heaviside 阶跃函数：
+
+$$
+H(x) = \\begin{cases}
+0 & \\text{如果 } x < 0 \\\\
+\\frac{1}{2} & \\text{如果 } x = 0 \\\\
+1 & \\text{如果 } x > 0
+\\end{cases}
+$$`);
+
+// 积分示例
+const mathIntegral = ref(`# 微积分与级数
+
+## 定积分
+
+高斯积分是概率论的基础：
+
+$$
+\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
+$$
+
+## 多重积分
+
+计算球体体积：
+
+$$
+V = \\int_{0}^{2\\pi} \\int_{0}^{\\pi} \\int_{0}^{r} \\rho^2 \\sin\\phi \\, d\\rho \\, d\\phi \\, d\\theta = \\frac{4}{3}\\pi r^3
+$$
+
+## 无穷级数
+
+几何级数：
+
+$$
+\\sum_{n=0}^{\\infty} ar^n = \\frac{a}{1-r}, \\quad |r| < 1
+$$
+
+调和级数（发散）：
+
+$$
+\\sum_{n=1}^{\\infty} \\frac{1}{n} = 1 + \\frac{1}{2} + \\frac{1}{3} + \\frac{1}{4} + \\cdots = \\infty
+$$
+
+## 泰勒级数
+
+指数函数的泰勒展开：
+
+$$
+e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!} = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\cdots
+$$`);
+
+// 量子力学示例
+const mathQuantum = ref(`# 量子力学基础
+
+## 薛定谔方程
+
+薛定谔方程是量子力学的基本方程，描述了量子系统的状态如何随时间演化。
+
+### 时间依赖薛定谔方程
+
+对于一个量子系统，其波函数 $\\Psi(\\mathbf{r}, t)$ 满足：
+
+$$
+i\\hbar\\frac{\\partial}{\\partial t}\\Psi(\\mathbf{r}, t) = \\hat{H}\\Psi(\\mathbf{r}, t)
+$$
+
+其中：
+- $i$ 是虚数单位
+- $\\hbar = \\frac{h}{2\\pi}$ 是约化普朗克常数
+- $\\hat{H}$ 是哈密顿算符
+
+### 时间无关薛定谔方程
+
+对于定态问题，可以分离变量得到：
+
+$$
+\\hat{H}\\psi(\\mathbf{r}) = E\\psi(\\mathbf{r})
+$$
+
+这是一个本征值问题，$E$ 是能量本征值。
+
+## 海森堡不确定性原理
+
+位置 $x$ 和动量 $p$ 的不确定性满足：
+
+$$
+\\Delta x \\cdot \\Delta p \\geq \\frac{\\hbar}{2}
+$$
+
+这意味着我们**不可能同时精确测量**粒子的位置和动量。`);
+
+// 交互式编辑器
+const editorMarkdown = ref(`# 数学公式编辑器
+
+尝试编辑下面的公式！
+
+## 行内公式
+
+质能方程：$E = mc^2$
+
+## 块级公式
+
+$$
+\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
+$$
+
+## 提示
+
+- 使用 \`$...$\` 表示行内公式
+- 使用 \`$$...$$\` 表示块级公式
+- 也可使用 \( 或 \] 渲染Latex格式公式
+- 记得转义反斜杠（使用 \`\\\\\` 而不是 \`\\\`）
+`);
+
+// Parser Options
+const parserOptionsBasic = {
+  supportsLaTeX: true,
+  extendedGrammar: ['mathjax'],
+};
+
+const parserOptionsGfm = {
+  supportsLaTeX: true,
+  extendedGrammar: ['gfm', 'mathjax'],
+};
+
+// 编辑器更新函数
+function updateEditorMarkdown(event) {
+  editorMarkdown.value = event.target.value;
+}
+</script>
+
 本示例展示如何使用 MarkdownRenderer 渲染各种类型的数学公式，包括行内公式、块级公式以及复杂的数学表达式。
 
 ## 基础用法
@@ -44,6 +281,12 @@ const parserOptions: ParserOptions = {
   <MarkdownRenderer :markdown="markdown" :parserOptions="parserOptions" />
 </template>
 ```
+
+**渲染效果：**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathBasic" :parserOptions="parserOptionsBasic" />
+</div>
 
 ## 复杂数学表达式
 
@@ -106,6 +349,12 @@ const parserOptions: ParserOptions = {
 </template>
 ```
 
+**渲染效果：**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathMatrix" :parserOptions="parserOptionsBasic" />
+</div>
+
 ### 多行对齐公式
 
 使用 `aligned` 环境展示推导过程：
@@ -146,6 +395,12 @@ const parserOptions: ParserOptions = {
   <MarkdownRenderer :markdown="markdown" :parserOptions="parserOptions" />
 </template>
 ```
+
+**渲染效果：**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathAligned" :parserOptions="parserOptionsBasic" />
+</div>
 
 ### 分段函数
 
@@ -206,6 +461,12 @@ const parserOptions: ParserOptions = {
   <MarkdownRenderer :markdown="markdown" :parserOptions="parserOptions" />
 </template>
 ```
+
+**渲染效果：**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathPiecewise" :parserOptions="parserOptionsBasic" />
+</div>
 
 ### 积分与求和
 
@@ -269,6 +530,12 @@ const parserOptions: ParserOptions = {
   <MarkdownRenderer :markdown="markdown" :parserOptions="parserOptions" />
 </template>
 ```
+
+**渲染效果：**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathIntegral" :parserOptions="parserOptionsBasic" />
+</div>
 
 ## 混合文档示例
 
@@ -350,78 +617,45 @@ const parserOptions: ParserOptions = {
 </template>
 ```
 
+**渲染效果：**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathQuantum" :parserOptions="parserOptionsGfm" />
+</div>
+
 ## 交互式数学公式编辑器
 
 实时编辑和预览数学公式：
 
-```vue
-<script setup lang="ts">
-import { ref } from 'vue';
-import { MarkdownRenderer } from '@markdown-next/vue';
-import type { ParserOptions } from '@markdown-next/parser';
+<div class="math-editor-container">
+  <div class="editor-section">
+    <div class="section-header">
+      <h3>Markdown 输入</h3>
+      <p class="hint">支持 GFM 和 LaTeX 数学公式</p>
+    </div>
+    <textarea
+      :value="editorMarkdown"
+      @input="updateEditorMarkdown"
+      class="math-editor"
+      placeholder="在此输入包含数学公式的 Markdown..."
+    />
+  </div>
 
-const markdown = ref(`# 数学公式编辑器
-
-尝试编辑下面的公式！
-
-## 行内公式
-
-质能方程：$E = mc^2$
-
-## 块级公式
-
-$$
-\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
-$$
-
-## 提示
-
-- 使用 \`$...$\` 表示行内公式
-- 使用 \`$$...$$\` 表示块级公式
-- 记得转义反斜杠（使用 \`\\\\\` 而不是 \`\\\`）
-`);
-
-const parserOptions: ParserOptions = {
-  supportsLaTeX: true,
-  extendedGrammar: ['gfm', 'mathjax'],
-};
-
-function updateMarkdown(event: Event) {
-  markdown.value = (event.target as HTMLTextAreaElement).value;
-}
-</script>
-
-<template>
-  <div class="math-editor-container">
-    <div class="editor-section">
-      <div class="section-header">
-        <h3>Markdown 输入</h3>
-        <p class="hint">支持 GFM 和 LaTeX 数学公式</p>
-      </div>
-      <textarea
-        :value="markdown"
-        @input="updateMarkdown"
-        class="math-editor"
-        placeholder="在此输入包含数学公式的 Markdown..."
+  <div class="preview-section">
+    <div class="section-header">
+      <h3>实时预览</h3>
+      <p class="hint">公式会自动渲染</p>
+    </div>
+    <div class="math-preview">
+      <MarkdownRenderer
+        :markdown="editorMarkdown"
+        :parserOptions="parserOptionsGfm"
+        :dynamic="true"
+        :debounceMs="300"
       />
     </div>
-
-    <div class="preview-section">
-      <div class="section-header">
-        <h3>实时预览</h3>
-        <p class="hint">公式会自动渲染</p>
-      </div>
-      <div class="math-preview">
-        <MarkdownRenderer
-          :markdown="markdown"
-          :parserOptions="parserOptions"
-          :dynamic="true"
-          :debounceMs="300"
-        />
-      </div>
-    </div>
   </div>
-</template>
+</div>
 
 <style scoped>
 .math-editor-container {
@@ -516,7 +750,6 @@ function updateMarkdown(event: Event) {
   }
 }
 </style>
-```
 
 ## 常用数学符号参考
 

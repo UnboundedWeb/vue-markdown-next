@@ -378,7 +378,6 @@ const parserOptions = {
 | `remarkPlugins`   | `PluggableList`             | `undefined` | Custom remark plugins (merged into `parserOptions`)                                                                                                                                                                          |
 | `rehypePlugins`   | `PluggableList`             | `undefined` | Custom rehype plugins (merged into `parserOptions`)                                                                                                                                                                          |
 | `mathJaxConfig`   | `MathJaxOptions`            | `undefined` | MathJax configuration (merged into `parserOptions`)                                                                                                                                                                          |
-| `supportsLaTeX`   | `boolean`                   | `undefined` | LaTeX syntax support (merged into `parserOptions`)                                                                                                                                                                           |
 
 ::: tip
 `MarkdownWorkerPoll` provides two ways to configure parser options:

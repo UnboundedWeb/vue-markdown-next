@@ -2,8 +2,6 @@
 
 本示例演示了 MarkdownRenderer 组件的基本用法。
 
-> 完整示例请参考[英文版本](/v1/en/examples/basic)
-
 ## 简单渲染
 
 最基本的用法：

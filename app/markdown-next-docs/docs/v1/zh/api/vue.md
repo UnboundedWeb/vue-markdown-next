@@ -39,6 +39,11 @@ defineComponent({
       type: Number,
       default: 250,
     },
+    loadingSlot: {
+      type: [Object, Function] as PropType<LoadingSlot>,
+      required: false,
+      default: undefined,
+    },
   },
 });
 ```
@@ -53,6 +58,7 @@ defineComponent({
 | `codeRenderer`  | `MarkdownComponent`  | 否   | `undefined` | 自定义代码渲染器       |
 | `dynamic`       | `boolean`            | 否   | `false`     | 启用响应式更新         |
 | `debounceMs`    | `number`             | 否   | `250`       | 防抖延迟（毫秒）       |
+| `loadingSlot`   | `LoadingSlot`        | 否   | `undefined` | 自定义加载状态组件     |
 
 **事件：**
 
@@ -86,6 +92,11 @@ defineComponent({
       type: Boolean,
       default: false,
     },
+    loadingSlot: {
+      type: [Object, Function] as PropType<LoadingSlot>,
+      required: false,
+      default: undefined,
+    },
   },
 });
 ```
@@ -98,6 +109,7 @@ defineComponent({
 | `parserOptions`      | `ParserOptions`         | 否   | `undefined` | 解析器配置         |
 | `renderOptions`      | `MarkdownRenderOptions` | 否   | `undefined` | 渲染选项           |
 | `forceRenderOptions` | `boolean`               | 否   | `false`     | 强制子组件使用选项 |
+| `loadingSlot`        | `LoadingSlot`           | 否   | `undefined` | 自定义加载状态组件 |
 
 **插槽：**
 
@@ -243,6 +255,16 @@ type MarkdownComponent =
   | string;
 ```
 
+### LoadingSlot
+
+自定义加载状态的组件或函数。
+
+```ts
+type LoadingSlot = Component | FunctionalComponent | (() => VNodeChild);
+```
+
+用于自定义 markdown 内容加载时显示的加载状态。可以是 Vue 组件、函数式组件或返回 VNode 的函数。
+
 ### MarkdownRenderOptions
 
 markdown 渲染选项。
@@ -270,6 +292,11 @@ interface MarkdownRenderOptions {
    * @default 250
    */
   debounceMs?: number;
+
+  /**
+   * 自定义加载状态组件
+   */
+  loadingSlot?: LoadingSlot;
 }
 ```
 
@@ -285,6 +312,7 @@ interface MarkdownRendererProps {
   codeRenderer?: MarkdownComponent;
   dynamic?: boolean;
   debounceMs?: number;
+  loadingSlot?: LoadingSlot;
 }
 ```
 
@@ -298,6 +326,11 @@ interface MarkdownWorkerPollProps {
   parserOptions?: ParserOptions;
   renderOptions?: MarkdownRenderOptions;
   forceRenderOptions?: boolean;
+  components?: MarkdownComponents;
+  codeRenderer?: MarkdownComponent;
+  dynamic?: boolean;
+  debounceMs?: number;
+  loadingSlot?: LoadingSlot;
 }
 ```
 

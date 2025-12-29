@@ -39,6 +39,11 @@ defineComponent({
       type: Number,
       default: 250,
     },
+    loadingSlot: {
+      type: [Object, Function] as PropType<LoadingSlot>,
+      required: false,
+      default: undefined,
+    },
   },
 });
 ```
@@ -53,6 +58,7 @@ defineComponent({
 | `codeRenderer`  | `MarkdownComponent`  | No       | `undefined` | Custom code renderer       |
 | `dynamic`       | `boolean`            | No       | `false`     | Enable reactive updates    |
 | `debounceMs`    | `number`             | No       | `250`       | Debounce delay (ms)        |
+| `loadingSlot`   | `LoadingSlot`        | No       | `undefined` | Custom loading component   |
 
 **Emits:**
 
@@ -86,6 +92,11 @@ defineComponent({
       type: Boolean,
       default: false,
     },
+    loadingSlot: {
+      type: [Object, Function] as PropType<LoadingSlot>,
+      required: false,
+      default: undefined,
+    },
   },
 });
 ```
@@ -98,6 +109,7 @@ defineComponent({
 | `parserOptions`      | `ParserOptions`         | No       | `undefined` | Parser configuration      |
 | `renderOptions`      | `MarkdownRenderOptions` | No       | `undefined` | Render options            |
 | `forceRenderOptions` | `boolean`               | No       | `false`     | Force options on children |
+| `loadingSlot`        | `LoadingSlot`           | No       | `undefined` | Custom loading component  |
 
 **Slots:**
 
@@ -243,6 +255,16 @@ type MarkdownComponent =
   | string;
 ```
 
+### LoadingSlot
+
+Custom loading state component or function.
+
+```ts
+type LoadingSlot = Component | FunctionalComponent | (() => VNodeChild);
+```
+
+Used to customize the loading state displayed while markdown content is being parsed. Can be a Vue component, functional component, or a function that returns a VNode.
+
 ### MarkdownRenderOptions
 
 Options for markdown rendering.
@@ -270,6 +292,11 @@ interface MarkdownRenderOptions {
    * @default 250
    */
   debounceMs?: number;
+
+  /**
+   * Custom loading state component
+   */
+  loadingSlot?: LoadingSlot;
 }
 ```
 
@@ -285,6 +312,7 @@ interface MarkdownRendererProps {
   codeRenderer?: MarkdownComponent;
   dynamic?: boolean;
   debounceMs?: number;
+  loadingSlot?: LoadingSlot;
 }
 ```
 
@@ -298,6 +326,11 @@ interface MarkdownWorkerPollProps {
   parserOptions?: ParserOptions;
   renderOptions?: MarkdownRenderOptions;
   forceRenderOptions?: boolean;
+  components?: MarkdownComponents;
+  codeRenderer?: MarkdownComponent;
+  dynamic?: boolean;
+  debounceMs?: number;
+  loadingSlot?: LoadingSlot;
 }
 ```
 

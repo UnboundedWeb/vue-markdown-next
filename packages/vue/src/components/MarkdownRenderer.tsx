@@ -1,6 +1,7 @@
 import {
   defineComponent,
   computed,
+  h,
   inject,
   onErrorCaptured,
   ref,
@@ -13,7 +14,12 @@ import type { ParserOptions } from '@markdown-next/parser';
 import { markdownWorkerContextKey } from '../context';
 import { useMarkdownParser } from '../hooks/useMarkdownParser';
 import { useMarkdownWorkerPool } from '../hooks/useMarkdownWorkerPool';
-import type { MarkdownComponent, MarkdownComponents, MarkdownRenderOptions } from '../types';
+import type {
+  LoadingSlot,
+  MarkdownComponent,
+  MarkdownComponents,
+  MarkdownRenderOptions,
+} from '../types';
 import { githubContainerStyle } from '../styles/themeGithub';
 import { toError } from '../utils/toError';
 
@@ -65,6 +71,11 @@ export const MarkdownRenderer = defineComponent({
       type: Number,
       default: 250,
     },
+    loadingSlot: {
+      type: [Object, Function] as PropType<LoadingSlot>,
+      required: false,
+      default: undefined,
+    },
   },
   setup(props) {
     const attrs = useAttrs();
@@ -82,6 +93,7 @@ export const MarkdownRenderer = defineComponent({
         const ctxOptions = context.renderOptions.value;
         if (ctxOptions?.components) options.components = ctxOptions.components;
         if (ctxOptions?.codeRenderer) options.codeRenderer = ctxOptions.codeRenderer;
+        if (ctxOptions?.loadingSlot) options.loadingSlot = ctxOptions.loadingSlot;
         options.dynamic = ctxOptions?.dynamic ?? false;
         options.debounceMs = ctxOptions?.debounceMs ?? 250;
         return options;
@@ -89,6 +101,7 @@ export const MarkdownRenderer = defineComponent({
 
       if (props.components) options.components = props.components;
       if (props.codeRenderer) options.codeRenderer = props.codeRenderer;
+      if (props.loadingSlot) options.loadingSlot = props.loadingSlot;
       return options;
     });
 
@@ -116,7 +129,15 @@ export const MarkdownRenderer = defineComponent({
       return result;
     });
 
-    const renderLoading = (): VNodeChild => (
+    const finalLoadingSlot = computed<LoadingSlot | undefined>(() => {
+      // 优先使用 WorkerPoll 上下文的 loadingSlot
+      const ctxLoadingSlot = context?.renderOptions.value?.loadingSlot;
+      if (ctxLoadingSlot) return ctxLoadingSlot;
+      // 其次使用 MarkdownRenderer 自身的 loadingSlot
+      return props.loadingSlot;
+    });
+
+    const renderDefaultLoading = (): VNodeChild => (
       <div style={loadingStyle}>
         <svg width="16" height="16" viewBox="0 0 50 50" aria-hidden="true">
           <circle
@@ -142,6 +163,15 @@ export const MarkdownRenderer = defineComponent({
         <span>Rendering markdown...</span>
       </div>
     );
+
+    const renderLoading = (): VNodeChild => {
+      const customLoadingSlot = finalLoadingSlot.value;
+      if (customLoadingSlot) {
+        return h(customLoadingSlot as never);
+      }
+      // 使用默认的 loading 动画
+      return renderDefaultLoading();
+    };
 
     const renderErrorNotice = (error: Error): VNodeChild => (
       <div style={errorStyle}>

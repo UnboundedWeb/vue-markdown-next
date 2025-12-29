@@ -1,5 +1,242 @@
 # Math Formula Rendering
 
+<script setup>
+import { ref } from 'vue';
+
+// Basic example
+const mathBasic = ref(`## Mathematical Constants
+
+There are many important constants in mathematics. For example:
+
+- Pi $\\pi \\approx 3.14159$
+- Euler's number $e \\approx 2.71828$
+- Golden ratio $\\varphi = \\frac{1+\\sqrt{5}}{2}$
+
+### Famous Formulas
+
+Euler's formula is considered one of the most beautiful mathematical formulas:
+
+$$
+e^{i\\pi} + 1 = 0
+$$
+
+This formula connects five of the most important mathematical constants.`);
+
+// Matrix example
+const mathMatrix = ref(`# Matrices in Linear Algebra
+
+## Basic Matrix
+
+A $2 \\times 2$ matrix:
+
+$$
+A = \\begin{pmatrix}
+a & b \\\\
+c & d
+\\end{pmatrix}
+$$
+
+## Identity Matrix
+
+The $3 \\times 3$ identity matrix $I_3$:
+
+$$
+I_3 = \\begin{pmatrix}
+1 & 0 & 0 \\\\
+0 & 1 & 0 \\\\
+0 & 0 & 1
+\\end{pmatrix}
+$$
+
+## Determinant
+
+The determinant of matrix $A$:
+
+$$
+\\det(A) = \\begin{vmatrix}
+a & b \\\\
+c & d
+\\end{vmatrix} = ad - bc
+$$`);
+
+// Aligned equations example
+const mathAligned = ref(`# Quadratic Equation Derivation
+
+Completing the square for $ax^2 + bx + c = 0$:
+
+$$
+\\begin{aligned}
+ax^2 + bx + c &= 0 \\\\
+x^2 + \\frac{b}{a}x + \\frac{c}{a} &= 0 \\\\
+x^2 + \\frac{b}{a}x &= -\\frac{c}{a} \\\\
+x^2 + \\frac{b}{a}x + \\frac{b^2}{4a^2} &= \\frac{b^2}{4a^2} - \\frac{c}{a} \\\\
+\\left(x + \\frac{b}{2a}\\right)^2 &= \\frac{b^2 - 4ac}{4a^2} \\\\
+x + \\frac{b}{2a} &= \\pm\\frac{\\sqrt{b^2-4ac}}{2a} \\\\
+x &= \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}
+\\end{aligned}
+$$
+
+This is the famous **quadratic formula**.`);
+
+// Piecewise functions example
+const mathPiecewise = ref(`# Piecewise Functions
+
+## Absolute Value Function
+
+The absolute value function can be defined as:
+
+$$
+|x| = \\begin{cases}
+x & \\text{if } x \\geq 0 \\\\
+-x & \\text{if } x < 0
+\\end{cases}
+$$
+
+## Sign Function
+
+The sign function $\\text{sgn}(x)$ is defined as:
+
+$$
+\\text{sgn}(x) = \\begin{cases}
+1 & \\text{if } x > 0 \\\\
+0 & \\text{if } x = 0 \\\\
+-1 & \\text{if } x < 0
+\\end{cases}
+$$
+
+## Heaviside Step Function
+
+The Heaviside step function:
+
+$$
+H(x) = \\begin{cases}
+0 & \\text{if } x < 0 \\\\
+\\frac{1}{2} & \\text{if } x = 0 \\\\
+1 & \\text{if } x > 0
+\\end{cases}
+$$`);
+
+// Integrals and series example
+const mathIntegral = ref(`# Calculus and Series
+
+## Definite Integral
+
+The Gaussian integral is fundamental in probability theory:
+
+$$
+\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
+$$
+
+## Multiple Integral
+
+Calculating the volume of a sphere:
+
+$$
+V = \\int_{0}^{2\\pi} \\int_{0}^{\\pi} \\int_{0}^{r} \\rho^2 \\sin\\phi \\, d\\rho \\, d\\phi \\, d\\theta = \\frac{4}{3}\\pi r^3
+$$
+
+## Infinite Series
+
+Geometric series:
+
+$$
+\\sum_{n=0}^{\\infty} ar^n = \\frac{a}{1-r}, \\quad |r| < 1
+$$
+
+Harmonic series (divergent):
+
+$$
+\\sum_{n=1}^{\\infty} \\frac{1}{n} = 1 + \\frac{1}{2} + \\frac{1}{3} + \\frac{1}{4} + \\cdots = \\infty
+$$
+
+## Taylor Series
+
+Taylor expansion of exponential function:
+
+$$
+e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!} = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\cdots
+$$`);
+
+// Quantum mechanics example
+const mathQuantum = ref(`# Quantum Mechanics Basics
+
+## Schrödinger Equation
+
+The Schrödinger equation is the fundamental equation of quantum mechanics, describing how quantum systems evolve over time.
+
+### Time-Dependent Schrödinger Equation
+
+For a quantum system, the wave function $\\Psi(\\mathbf{r}, t)$ satisfies:
+
+$$
+i\\hbar\\frac{\\partial}{\\partial t}\\Psi(\\mathbf{r}, t) = \\hat{H}\\Psi(\\mathbf{r}, t)
+$$
+
+Where:
+- $i$ is the imaginary unit
+- $\\hbar = \\frac{h}{2\\pi}$ is the reduced Planck constant
+- $\\hat{H}$ is the Hamiltonian operator
+
+### Time-Independent Schrödinger Equation
+
+For stationary states, separation of variables yields:
+
+$$
+\\hat{H}\\psi(\\mathbf{r}) = E\\psi(\\mathbf{r})
+$$
+
+This is an eigenvalue problem where $E$ is the energy eigenvalue.
+
+## Heisenberg Uncertainty Principle
+
+The uncertainty in position $x$ and momentum $p$ satisfies:
+
+$$
+\\Delta x \\cdot \\Delta p \\geq \\frac{\\hbar}{2}
+$$
+
+This means we **cannot simultaneously measure** both position and momentum with arbitrary precision.`);
+
+// Interactive editor
+const editorMarkdown = ref(`# Math Formula Editor
+
+Try editing the formulas below!
+
+## Inline Formula
+
+Einstein's mass-energy equivalence: $E = mc^2$
+
+## Block Formula
+
+$$
+\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
+$$
+
+## Tips
+
+- Use \`$...$\` for inline formulas
+- Use \`$$...$$\` for block formulas
+- You can also use \( or \] to render LaTeX-formatted formulas.
+- Remember to escape backslashes (use \`\\\\\` instead of \`\\\`)
+`);
+
+// Parser Options
+const parserOptionsBasic = {
+  supportsLaTeX: true,
+  extendedGrammar: ['mathjax'],
+};
+
+const parserOptionsGfm = {
+  supportsLaTeX: true,
+  extendedGrammar: ['gfm', 'mathjax'],
+};
+
+// Editor update function
+function updateEditorMarkdown(event) {
+  editorMarkdown.value = event.target.value;
+}
+</script>
+
 This example demonstrates how to use MarkdownRenderer to render various types of mathematical formulas, including inline formulas, block formulas, and complex mathematical expressions.
 
 ## Basic Usage
@@ -44,6 +281,12 @@ const parserOptions: ParserOptions = {
   <MarkdownRenderer :markdown="markdown" :parserOptions="parserOptions" />
 </template>
 ```
+
+**Rendered Output:**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathBasic" :parserOptions="parserOptionsBasic" />
+</div>
 
 ## Complex Mathematical Expressions
 
@@ -106,6 +349,12 @@ const parserOptions: ParserOptions = {
 </template>
 ```
 
+**Rendered Output:**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathMatrix" :parserOptions="parserOptionsBasic" />
+</div>
+
 ### Multi-line Aligned Equations
 
 Using the `aligned` environment to show derivation steps:
@@ -146,6 +395,12 @@ const parserOptions: ParserOptions = {
   <MarkdownRenderer :markdown="markdown" :parserOptions="parserOptions" />
 </template>
 ```
+
+**Rendered Output:**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathAligned" :parserOptions="parserOptionsBasic" />
+</div>
 
 ### Piecewise Functions
 
@@ -206,6 +461,12 @@ const parserOptions: ParserOptions = {
   <MarkdownRenderer :markdown="markdown" :parserOptions="parserOptions" />
 </template>
 ```
+
+**Rendered Output:**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathPiecewise" :parserOptions="parserOptionsBasic" />
+</div>
 
 ### Integrals and Summations
 
@@ -269,6 +530,12 @@ const parserOptions: ParserOptions = {
   <MarkdownRenderer :markdown="markdown" :parserOptions="parserOptions" />
 </template>
 ```
+
+**Rendered Output:**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathIntegral" :parserOptions="parserOptionsBasic" />
+</div>
 
 ## Mixed Document Example
 
@@ -350,78 +617,45 @@ const parserOptions: ParserOptions = {
 </template>
 ```
 
+**Rendered Output:**
+
+<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; background: #fafafa;">
+  <MarkdownRenderer :markdown="mathQuantum" :parserOptions="parserOptionsGfm" />
+</div>
+
 ## Interactive Math Formula Editor
 
 Real-time editing and preview of math formulas:
 
-```vue
-<script setup lang="ts">
-import { ref } from 'vue';
-import { MarkdownRenderer } from '@markdown-next/vue';
-import type { ParserOptions } from '@markdown-next/parser';
+<div class="math-editor-container">
+  <div class="editor-section">
+    <div class="section-header">
+      <h3>Markdown Input</h3>
+      <p class="hint">Supports GFM and LaTeX math formulas</p>
+    </div>
+    <textarea
+      :value="editorMarkdown"
+      @input="updateEditorMarkdown"
+      class="math-editor"
+      placeholder="Enter Markdown with math formulas here..."
+    />
+  </div>
 
-const markdown = ref(`# Math Formula Editor
-
-Try editing the formulas below!
-
-## Inline Formula
-
-Mass-energy equation: $E = mc^2$
-
-## Block Formula
-
-$$
-\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
-$$
-
-## Tips
-
-- Use \`$...$\` for inline formulas
-- Use \`$$...$$\` for block formulas
-- Remember to escape backslashes (use \`\\\\\` instead of \`\\\`)
-`);
-
-const parserOptions: ParserOptions = {
-  supportsLaTeX: true,
-  extendedGrammar: ['gfm', 'mathjax'],
-};
-
-function updateMarkdown(event: Event) {
-  markdown.value = (event.target as HTMLTextAreaElement).value;
-}
-</script>
-
-<template>
-  <div class="math-editor-container">
-    <div class="editor-section">
-      <div class="section-header">
-        <h3>Markdown Input</h3>
-        <p class="hint">Supports GFM and LaTeX math formulas</p>
-      </div>
-      <textarea
-        :value="markdown"
-        @input="updateMarkdown"
-        class="math-editor"
-        placeholder="Enter Markdown with math formulas here..."
+  <div class="preview-section">
+    <div class="section-header">
+      <h3>Live Preview</h3>
+      <p class="hint">Formulas are automatically rendered</p>
+    </div>
+    <div class="math-preview">
+      <MarkdownRenderer
+        :markdown="editorMarkdown"
+        :parserOptions="parserOptionsGfm"
+        :dynamic="true"
+        :debounceMs="300"
       />
     </div>
-
-    <div class="preview-section">
-      <div class="section-header">
-        <h3>Live Preview</h3>
-        <p class="hint">Formulas are automatically rendered</p>
-      </div>
-      <div class="math-preview">
-        <MarkdownRenderer
-          :markdown="markdown"
-          :parserOptions="parserOptions"
-          :dynamic="true"
-          :debounceMs="300"
-        />
-      </div>
-    </div>
   </div>
-</template>
+</div>
 
 <style scoped>
 .math-editor-container {
@@ -516,7 +750,6 @@ function updateMarkdown(event: Event) {
   }
 }
 </style>
-```
 
 ## Common Math Symbol Reference
 

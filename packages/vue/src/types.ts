@@ -1,14 +1,16 @@
-import type { Component, FunctionalComponent, Ref } from 'vue';
+import type { Component, FunctionalComponent, Ref, VNodeChild } from 'vue';
 import type { ParserOptions } from '@markdown-next/parser';
 
 export type MarkdownComponent = Component | FunctionalComponent | string;
 export type MarkdownComponents = Record<string, MarkdownComponent>;
+export type LoadingSlot = Component | FunctionalComponent | (() => VNodeChild);
 
 export interface MarkdownRenderOptions {
   components?: MarkdownComponents;
   codeRenderer?: MarkdownComponent;
   dynamic?: boolean;
   debounceMs?: number;
+  loadingSlot?: LoadingSlot;
 }
 
 export interface MarkdownRendererProps extends MarkdownRenderOptions {

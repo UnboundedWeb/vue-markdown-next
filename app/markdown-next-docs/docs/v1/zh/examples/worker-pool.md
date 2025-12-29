@@ -2,8 +2,6 @@
 
 了解如何使用 MarkdownWorkerPoll 组件来提升多个 markdown 文档或频繁更新的性能。
 
-> 完整示例请参考[英文版本](/v1/en/examples/worker-pool)
-
 ## 为什么使用 Worker 池？
 
 Worker 池提供了几个好处：

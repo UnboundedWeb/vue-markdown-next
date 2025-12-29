@@ -4,6 +4,7 @@ import type { ParserOptions } from '@markdown-next/parser';
 import { createWorkerPool } from '@markdown-next/parser';
 import { markdownWorkerContextKey } from '../context';
 import type {
+  LoadingSlot,
   MarkdownComponent,
   MarkdownComponents,
   MarkdownRenderOptions,
@@ -47,11 +48,6 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
       required: false,
       default: undefined,
     },
-    supportsLaTeX: {
-      type: Boolean,
-      required: false,
-      default: undefined,
-    },
     components: {
       type: Object as PropType<MarkdownComponents>,
       required: false,
@@ -72,6 +68,11 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
       required: false,
       default: undefined,
     },
+    loadingSlot: {
+      type: [Object, Function] as PropType<LoadingSlot>,
+      required: false,
+      default: undefined,
+    },
   },
   setup(props, { slots }) {
     const poolOptions: ParserOptions & { workerCount?: number } = {
@@ -83,7 +84,6 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
     if (props.remarkPlugins) poolOptions.remarkPlugins = props.remarkPlugins;
     if (props.rehypePlugins) poolOptions.rehypePlugins = props.rehypePlugins;
     if (props.mathJaxConfig) poolOptions.mathJaxConfig = props.mathJaxConfig;
-    if (props.supportsLaTeX != null) poolOptions.supportsLaTeX = props.supportsLaTeX;
 
     const pool = createWorkerPool(poolOptions);
 
@@ -92,7 +92,8 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
         props.components == null &&
         props.codeRenderer == null &&
         props.dynamic == null &&
-        props.debounceMs == null
+        props.debounceMs == null &&
+        props.loadingSlot == null
       ) {
         return undefined;
       }
@@ -103,6 +104,7 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
       };
       if (props.components) options.components = props.components;
       if (props.codeRenderer) options.codeRenderer = props.codeRenderer;
+      if (props.loadingSlot) options.loadingSlot = props.loadingSlot;
       return options;
     });
 

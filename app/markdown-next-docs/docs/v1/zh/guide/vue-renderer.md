@@ -378,7 +378,6 @@ const parserOptions = {
 | `remarkPlugins`   | `PluggableList`             | `undefined` | 自定义 remark 插件（会合并到 `parserOptions` 中）                                                                                                       |
 | `rehypePlugins`   | `PluggableList`             | `undefined` | 自定义 rehype 插件（会合并到 `parserOptions` 中）                                                                                                       |
 | `mathJaxConfig`   | `MathJaxOptions`            | `undefined` | MathJax 配置（会合并到 `parserOptions` 中）                                                                                                             |
-| `supportsLaTeX`   | `boolean`                   | `undefined` | 是否支持 LaTeX 语法（会合并到 `parserOptions` 中）                                                                                                      |
 
 ::: tip 提示
 `MarkdownWorkerPoll` 提供了两种方式配置解析器选项：
