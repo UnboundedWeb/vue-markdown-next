@@ -390,7 +390,7 @@ Both approaches can be used simultaneously, with individual props taking precede
 
 ## Custom Components
 
-Override default HTML element rendering with custom Vue components:
+Using a custom Vue component to override the default GitHub-styled HTML element rendering:
 
 ```vue
 <script setup lang="ts">
@@ -613,30 +613,3 @@ const parserOptions = {
 ```
 
 See the [Math Formula Examples](/v1/en/examples/math) for more complex usage and an interactive editor.
-
-## Styling
-
-The renderer includes GitHub-style default CSS. You can override it:
-
-```vue
-<template>
-  <MarkdownRenderer :markdown="markdown" class="custom-markdown" />
-</template>
-
-<style>
-.custom-markdown {
-  /* Override default styles */
-  font-family: 'Your Custom Font';
-}
-
-.custom-markdown h1 {
-  color: #e67e22;
-}
-
-.custom-markdown code {
-  background: #f5f5f5;
-  padding: 0.2em 0.4em;
-  border-radius: 3px;
-}
-</style>
-```

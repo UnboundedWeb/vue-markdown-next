@@ -22,6 +22,7 @@ const sharedSidebar: DefaultTheme.Sidebar = {
       items: [
         { text: 'Parser', link: '/guide/parser' },
         { text: 'Vue Renderer', link: '/guide/vue-renderer' },
+        { text: 'Bundler Configuration', link: '/guide/bundler-config' },
       ],
     },
   ],
@@ -136,6 +137,7 @@ export default defineConfig({
               items: [
                 { text: '解析器', link: '/v1/zh/guide/parser' },
                 { text: 'Vue 渲染器', link: '/v1/zh/guide/vue-renderer' },
+                { text: '打包器配置', link: '/v1/zh/guide/bundler-config' },
               ],
             },
           ],

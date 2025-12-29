@@ -388,9 +388,9 @@ const parserOptions = {
 这两种方式可以同时使用，单独的属性会覆盖 `parserOptions` 中的相应配置。
 :::
 
-## 自定义组件
+## 自定义组件(自定义样式)
 
-使用自定义 Vue 组件覆盖默认的 HTML 元素渲染：
+使用自定义 Vue 组件覆盖默认的 Github 样式的 HTML 元素渲染：
 
 ```vue
 <script setup lang="ts">
@@ -598,30 +598,3 @@ const parserOptions = {
 ```
 
 查看 [数学公式示例](/v1/zh/examples/math) 了解更多复杂用法和交互式编辑器。
-
-## 样式
-
-渲染器包含 GitHub 风格的默认 CSS。你可以覆盖它：
-
-```vue
-<template>
-  <MarkdownRenderer :markdown="markdown" class="custom-markdown" />
-</template>
-
-<style>
-.custom-markdown {
-  /* 覆盖默认样式 */
-  font-family: 'Your Custom Font';
-}
-
-.custom-markdown h1 {
-  color: #e67e22;
-}
-
-.custom-markdown code {
-  background: #f5f5f5;
-  padding: 0.2em 0.4em;
-  border-radius: 3px;
-}
-</style>
-```
