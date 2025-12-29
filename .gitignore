@@ -6,7 +6,7 @@ node_modules
 dist
 **/dist
 *.log
-
+**/cache
 # IDE
 .vscode
 .idea
