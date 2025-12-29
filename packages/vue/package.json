@@ -1,6 +1,6 @@
 {
   "name": "@markdown-next/vue",
-  "version": "0.0.1-alpha",
+  "version": "0.0.2-alpha",
   "type": "module",
   "description": "Vue renderer for markdown-next",
   "module": "dist/index.mjs",
@@ -19,7 +19,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc -p tsconfig.build.json",
-    "typecheck": "tsc -b",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "test": "vitest",
@@ -35,11 +35,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/vue-markdown-next.git",
+    "url": "https://github.com/UnboundedWeb/vue-markdown-next.git",
     "directory": "packages/vue"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/vue-markdown-next/issues"
+    "url": "https://github.com/UnboundedWeb/vue-markdown-next/issues"
   },
   "engines": {
     "node": ">=16.0.0"

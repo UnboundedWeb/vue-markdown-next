@@ -5,11 +5,9 @@
     "outDir": "./dist",
     "composite": true,
     "baseUrl": ".",
-    "paths": {
-      "@markdown-next/shared": ["../shared/src/index.ts"]
-    }
+    "paths": {}
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "../shared" }]
+  "references": []
 }
