@@ -1,0 +1,318 @@
+name: NPM Publish and Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      packages:
+        description: 'Packages to publish (comma-separated: parser,vue or "all")'
+        required: true
+        default: 'all'
+        type: string
+      changelog:
+        description: 'Release changelog (required)'
+        required: true
+        type: string
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate changelog input
+        run: |
+          if [ -z "${{ github.event.inputs.changelog }}" ]; then
+            echo "❌ Changelog is required for release"
+            echo "Please provide a detailed changelog describing the changes in this release."
+            exit 1
+          fi
+          echo "✅ Changelog provided"
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: validate
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linting
+        run: pnpm run lint
+
+      - name: Run type checking
+        run: pnpm run typecheck
+
+      - name: Configure git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Determine packages to publish
+        id: packages
+        run: |
+          INPUT_PACKAGES="${{ github.event.inputs.packages }}"
+
+          if [ "$INPUT_PACKAGES" = "all" ]; then
+            PACKAGES="parser vue"
+          else
+            PACKAGES=$(echo "$INPUT_PACKAGES" | tr ',' ' ')
+          fi
+
+          echo "packages=$PACKAGES" >> $GITHUB_OUTPUT
+          echo "📦 Packages to publish: $PACKAGES"
+
+      - name: Bump versions and collect info
+        id: version
+        run: |
+          PACKAGES="${{ steps.packages.outputs.packages }}"
+          VERSION_TYPE="${{ github.event.inputs.version_type }}"
+
+          VERSIONS_JSON="{"
+          CHANGED_FILES=""
+
+          for pkg in $PACKAGES; do
+            PKG_DIR="packages/$pkg"
+
+            if [ ! -d "$PKG_DIR" ]; then
+              echo "❌ Package directory $PKG_DIR not found"
+              exit 1
+            fi
+
+            cd "$PKG_DIR"
+
+            # Get current version
+            CURRENT_VERSION=$(node -p "require('./package.json').version")
+            echo "Current version of @markdown-next/$pkg: $CURRENT_VERSION"
+
+            # Bump version based on input
+            case "$VERSION_TYPE" in
+              "major")
+                NEW_VERSION=$(npm version major --no-git-tag-version)
+                ;;
+              "minor")
+                NEW_VERSION=$(npm version minor --no-git-tag-version)
+                ;;
+              "patch")
+                NEW_VERSION=$(npm version patch --no-git-tag-version)
+                ;;
+            esac
+
+            # Remove 'v' prefix from npm version output
+            NEW_VERSION=${NEW_VERSION#v}
+            echo "New version of @markdown-next/$pkg: $NEW_VERSION"
+
+            # Add to JSON
+            if [ "$VERSIONS_JSON" != "{" ]; then
+              VERSIONS_JSON="${VERSIONS_JSON},"
+            fi
+            VERSIONS_JSON="${VERSIONS_JSON}\"$pkg\":\"$NEW_VERSION\""
+
+            # Track changed files
+            CHANGED_FILES="$CHANGED_FILES $PKG_DIR/package.json"
+
+            cd ../..
+          done
+
+          VERSIONS_JSON="${VERSIONS_JSON}}"
+
+          echo "versions=$VERSIONS_JSON" >> $GITHUB_OUTPUT
+          echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "version_tag=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate CHANGELOG
+        run: |
+          PACKAGES="${{ steps.packages.outputs.packages }}"
+
+          for pkg in $PACKAGES; do
+            PKG_DIR="packages/$pkg"
+            cd "$PKG_DIR"
+
+            # Create or update CHANGELOG.md
+            if [ ! -f CHANGELOG.md ]; then
+              echo "# Changelog" > CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              echo "All notable changes to this project will be documented in this file." >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+            fi
+
+            # Get version from versions JSON
+            VERSION=$(echo '${{ steps.version.outputs.versions }}' | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8'))['$pkg']")
+
+            # Prepare new changelog entry
+            TODAY=$(date +"%Y-%m-%d")
+            NEW_ENTRY="## [$VERSION] - $TODAY"
+
+            # Create temporary file with new entry
+            cat > temp_changelog.md << EOF
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+$NEW_ENTRY
+
+${{ github.event.inputs.changelog }}
+
+EOF
+
+            # Append existing changelog (skip header)
+            if [ -f CHANGELOG.md ]; then
+              tail -n +4 CHANGELOG.md >> temp_changelog.md
+            fi
+
+            # Replace original changelog
+            mv temp_changelog.md CHANGELOG.md
+
+            cd ../..
+          done
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Run tests
+        run: pnpm run test
+        continue-on-error: false
+
+      - name: Publish packages to NPM
+        run: |
+          PACKAGES="${{ steps.packages.outputs.packages }}"
+
+          for pkg in $PACKAGES; do
+            PKG_DIR="packages/$pkg"
+            cd "$PKG_DIR"
+
+            echo "📦 Publishing @markdown-next/$pkg..."
+            pnpm publish --access public --no-git-checks
+
+            if [ $? -eq 0 ]; then
+              echo "✅ Successfully published @markdown-next/$pkg"
+            else
+              echo "❌ Failed to publish @markdown-next/$pkg"
+              exit 1
+            fi
+
+            cd ../..
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Commit and push changes
+        run: |
+          PACKAGES="${{ steps.packages.outputs.packages }}"
+
+          # Add all package.json and CHANGELOG.md files
+          for pkg in $PACKAGES; do
+            git add "packages/$pkg/package.json"
+            git add "packages/$pkg/CHANGELOG.md"
+          done
+
+          # Create commit message
+          COMMIT_MSG="chore: release v${{ steps.version.outputs.version_tag }}
+
+Published packages: $PACKAGES
+
+${{ github.event.inputs.changelog }}"
+
+          git commit -m "$COMMIT_MSG"
+          git push origin main
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version_tag }}
+          name: Release v${{ steps.version.outputs.version_tag }}
+          body: |
+            ## Release v${{ steps.version.outputs.version_tag }}
+
+            ${{ github.event.inputs.changelog }}
+
+            ---
+
+            ### 📦 Published Packages
+
+            ${{ steps.packages.outputs.packages }}
+
+            **Version Information:**
+            ```json
+            ${{ steps.version.outputs.versions }}
+            ```
+
+            ### 📥 Installation
+
+            ```bash
+            # Install parser
+            npm install @markdown-next/parser@${{ steps.version.outputs.version_tag }}
+            # or
+            pnpm add @markdown-next/parser@${{ steps.version.outputs.version_tag }}
+
+            # Install vue renderer
+            npm install @markdown-next/vue@${{ steps.version.outputs.version_tag }}
+            # or
+            pnpm add @markdown-next/vue@${{ steps.version.outputs.version_tag }}
+            ```
+
+            ### 🔗 Links
+            - **NPM - Parser**: https://www.npmjs.com/package/@markdown-next/parser
+            - **NPM - Vue**: https://www.npmjs.com/package/@markdown-next/vue
+            - **Repository**: https://github.com/${{ github.repository }}
+
+            ### 📋 Full Changelog
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.version.outputs.version_tag }}...v${{ steps.version.outputs.version_tag }}
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version_tag, 'alpha') || contains(steps.version.outputs.version_tag, 'beta') }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: publish
+    if: success()
+    steps:
+      - name: Release notification
+        run: |
+          echo "🎉 Successfully released packages"
+          echo "📦 NPM Parser: https://www.npmjs.com/package/@markdown-next/parser"
+          echo "📦 NPM Vue: https://www.npmjs.com/package/@markdown-next/vue"
+          echo "🏷️ GitHub Release: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.publish.outputs.version_tag }}"

@@ -59,7 +59,7 @@ const markdown = '# 你好世界\n\n这是 **markdown**！';
 </script>
 
 <template>
-  <MarkdownRenderer :content="markdown" />
+  <MarkdownRenderer :markdown="markdown" />
 </template>
 ```
 

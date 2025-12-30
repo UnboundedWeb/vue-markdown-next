@@ -59,7 +59,7 @@ const markdown = '# Hello World\n\nThis is **markdown**!';
 </script>
 
 <template>
-  <MarkdownRenderer :content="markdown" />
+  <MarkdownRenderer :markdown="markdown" />
 </template>
 ```
 
