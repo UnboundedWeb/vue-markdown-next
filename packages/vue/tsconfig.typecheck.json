@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noEmit": true,
     "composite": false,
-    "incremental": false
+    "incremental": false,
+    "rootDir": ".."
   }
 }
