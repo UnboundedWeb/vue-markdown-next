@@ -23,22 +23,6 @@
 - **[@markdown-next/parser](../packages/parser)**：核心 Markdown 解析器，支持 Worker
 - **[@markdown-next/vue](../packages/vue)**：Vue 3 渲染器
 
-## 快速开始
-
-```bash
-# 安装依赖
-pnpm install
-
-# 构建所有包
-pnpm build
-
-# 运行测试
-pnpm test
-
-# 开发模式
-pnpm dev
-```
-
 ## 安装
 
 ```bash

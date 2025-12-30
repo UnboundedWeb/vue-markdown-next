@@ -23,22 +23,6 @@ This monorepo contains:
 - **[@markdown-next/parser](./packages/parser)**: Core markdown parser with Worker support
 - **[@markdown-next/vue](./packages/vue)**: Vue 3 renderer for parsed markdown
 
-## Quick Start
-
-```bash
-# Install dependencies
-pnpm install
-
-# Build packages
-pnpm build
-
-# Run tests
-pnpm test
-
-# Development mode
-pnpm dev
-```
-
 ## Installation
 
 ```bash
