@@ -62,12 +62,13 @@ export const i18n = createI18n({
   globalInjection: true,
   locale: 'en',
   fallbackLocale: 'en',
+  escapeParameter: true,
   messages: {
     zh: {
       app: {
         eyebrow: 'packages/vue · playground',
         title: 'Markdown Next Preview',
-        subtitle: '左侧编辑，右侧使用 @markdown-next/vue 渲染结果。',
+        subtitle: "左侧编辑，右侧使用 {'@'}markdown-next/vue 渲染结果。",
         badge: 'Test Suite',
       },
       language: {
@@ -89,7 +90,7 @@ export const i18n = createI18n({
       },
       preview: {
         title: '实时渲染',
-        description: '由 @markdown-next/vue 渲染，带 GitHub 风格主题。',
+        description: "由 {'@'}markdown-next/vue 渲染，带 GitHub 风格主题。",
       },
       customPreview: {
         title: '自定义渲染样式',
@@ -99,15 +100,12 @@ export const i18n = createI18n({
         live: 'Live',
         custom: 'Custom',
       },
-      samples: {
-        markdown: markdownSamples.zh,
-      },
     },
     en: {
       app: {
         eyebrow: 'packages/vue · playground',
         title: 'Markdown Next Preview',
-        subtitle: 'Edit on the left, rendered by @markdown-next/vue on the right.',
+        subtitle: "Edit on the left, rendered by {'@'}markdown-next/vue on the right.",
         badge: 'Test Suite',
       },
       language: {
@@ -129,7 +127,7 @@ export const i18n = createI18n({
       },
       preview: {
         title: 'Live Render',
-        description: 'Rendered by @markdown-next/vue with a GitHub-style theme.',
+        description: "Rendered by {'@'}markdown-next/vue with a GitHub-style theme.",
       },
       customPreview: {
         title: 'Custom Render Styles',
@@ -138,9 +136,6 @@ export const i18n = createI18n({
       status: {
         live: 'Live',
         custom: 'Custom',
-      },
-      samples: {
-        markdown: markdownSamples.en,
       },
     },
   },
