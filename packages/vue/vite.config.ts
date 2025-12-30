@@ -12,7 +12,6 @@ export default defineConfig({
     // Prefer worker condition to avoid DOM-only exports in web workers.
     conditions: ['worker', 'browser', 'module', 'import', 'default'],
   },
-  sourceMap: false,
   build: {
     sourcemap: false,
     lib: {
