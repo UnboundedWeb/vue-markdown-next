@@ -5,7 +5,7 @@
 
 > Next-generation markdown parser and Vue renderer with high-performance Worker support.
 
-[中文文档](./readme/README.zh-CN.md) | [Documentation](https://unboundedweb.github.io/vue-markdown-next/)
+[中文文档](./readme/README.zh-CN.md) | [Documentation](https://docs.markdown.team/)
 
 ## Features
 
@@ -22,22 +22,6 @@ This monorepo contains:
 
 - **[@markdown-next/parser](./packages/parser)**: Core markdown parser with Worker support
 - **[@markdown-next/vue](./packages/vue)**: Vue 3 renderer for parsed markdown
-
-## Quick Start
-
-```bash
-# Install dependencies
-pnpm install
-
-# Build packages
-pnpm build
-
-# Run tests
-pnpm test
-
-# Development mode
-pnpm dev
-```
 
 ## Installation
 

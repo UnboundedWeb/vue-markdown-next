@@ -6,6 +6,7 @@ const sharedNav: DefaultTheme.NavItem[] = [
   { text: 'Guide', link: '/guide/getting-started' },
   { text: 'API Reference', link: '/api/parser' },
   { text: 'Examples', link: '/examples/basic' },
+  { text: 'Online Preview', link: 'https://preview.markdown.team/', target: '_blank' },
 ];
 
 const sharedSidebar: DefaultTheme.Sidebar = {
@@ -68,7 +69,7 @@ export default defineConfig({
           { text: 'Home', link: '/v1/en/' },
           ...sharedNav.map((item) => ({
             ...item,
-            link: `/v1/en${item.link}`,
+            link: item.link.startsWith('http') ? item.link : `/v1/en${item.link}`,
           })),
           {
             text: 'v1.0',
@@ -114,6 +115,7 @@ export default defineConfig({
           { text: '指南', link: '/v1/zh/guide/getting-started' },
           { text: 'API 参考', link: '/v1/zh/api/parser' },
           { text: '示例', link: '/v1/zh/examples/basic' },
+          { text: '在线预览', link: 'https://preview.markdown.team/', target: '_blank' },
           {
             text: 'v1.0',
             items: [
