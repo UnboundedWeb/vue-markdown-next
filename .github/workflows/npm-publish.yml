@@ -185,16 +185,16 @@ jobs:
             NEW_ENTRY="## [$VERSION] - $TODAY"
 
             # Create temporary file with new entry
-            cat > temp_changelog.md << EOF
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-$NEW_ENTRY
-
-${{ github.event.inputs.changelog }}
-
-EOF
+            {
+              echo "# Changelog"
+              echo ""
+              echo "All notable changes to this project will be documented in this file."
+              echo ""
+              echo "$NEW_ENTRY"
+              echo ""
+              echo "${{ github.event.inputs.changelog }}"
+              echo ""
+            } > temp_changelog.md
 
             # Append existing changelog (skip header)
             if [ -f CHANGELOG.md ]; then
@@ -247,14 +247,16 @@ EOF
             git add "packages/$pkg/CHANGELOG.md"
           done
 
-          # Create commit message
-          COMMIT_MSG="chore: release v${{ steps.version.outputs.version_tag }}
+          # Create commit with message
+          {
+            echo "chore: release v${{ steps.version.outputs.version_tag }}"
+            echo ""
+            echo "Published packages: $PACKAGES"
+            echo ""
+            echo "${{ github.event.inputs.changelog }}"
+          } > /tmp/commit-msg.txt
 
-Published packages: $PACKAGES
-
-${{ github.event.inputs.changelog }}"
-
-          git commit -m "$COMMIT_MSG"
+          git commit -F /tmp/commit-msg.txt
           git push origin main
 
       - name: Create GitHub Release
