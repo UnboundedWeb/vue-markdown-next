@@ -2,7 +2,7 @@
 import { describe, it, beforeEach, expect } from 'vitest';
 import type { Processor } from 'unified';
 import type { Root } from 'hast';
-import { getParser } from '../src';
+import { getParser } from '../src/modules/core';
 import { testParserConfig } from './defautlConfig';
 
 type HtmlProcessor = Processor<Root, Root, Root, Root, string>;
