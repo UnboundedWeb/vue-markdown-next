@@ -4,6 +4,11 @@
     "noEmit": true,
     "composite": false,
     "incremental": false,
-    "rootDir": ".."
-  }
+    "rootDir": "..",
+    "baseUrl": ".",
+    "paths": {
+      "@markdown-next/parser": ["../parser/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*", "../parser/src/**/*"]
 }
