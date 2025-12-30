@@ -5,7 +5,7 @@
 
 > 下一代高性能 Markdown 解析器和 Vue 渲染器，支持 Worker 多线程处理。
 
-[English](../README.md) | [在线文档](https://unboundedweb.github.io/vue-markdown-next/)
+[English](../README.md) | [在线文档](https://docs.markdown.team/)
 
 ## 特性
 

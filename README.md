@@ -5,7 +5,7 @@
 
 > Next-generation markdown parser and Vue renderer with high-performance Worker support.
 
-[中文文档](./readme/README.zh-CN.md) | [Documentation](https://unboundedweb.github.io/vue-markdown-next/)
+[中文文档](./readme/README.zh-CN.md) | [Documentation](https://docs.markdown.team/)
 
 ## Features
 
