@@ -10,7 +10,8 @@
     "lint": "pnpm --filter \"./packages/*\" lint",
     "lint:fix": "pnpm --filter \"./packages/*\" lint:fix",
     "test": "pnpm --filter \"./packages/*\" test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prebuild:pkg": "pnpm install && pnpm run build"
   },
   "keywords": [
     "vue",
