@@ -1,0 +1,3 @@
+interface:
+  display_name: "VMDN 项目规范"
+  short_description: "按项目约束实施改造、测试与兼容修复"
