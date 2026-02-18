@@ -4,6 +4,7 @@ export { Parser, createParser, type ParserOptions } from './modules/parser';
 // 多线程解析器（Worker 池）
 export {
   ParserWorkerPool,
+  ParserWorkerPool as MarkdownWorkerPool,
   createWorkerPool,
   type WorkerPoolOptions,
 } from './modules/parser.workerPool';

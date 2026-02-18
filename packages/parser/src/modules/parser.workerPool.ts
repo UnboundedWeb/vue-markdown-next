@@ -2,6 +2,9 @@ import { wrap, Remote } from 'comlink';
 import { Root } from 'hast';
 import type { ParserOptions } from './parser';
 
+const WORKER_MODULE_PATH = './modules/parser.worker.mjs';
+const VITE_OPTIMIZED_DEPS_SEGMENT = '/.vite/deps/';
+
 /**
  * Worker 实例接口
  */
@@ -64,6 +67,19 @@ function getMaxWorkers(): number {
 }
 
 /**
+ * 解析浏览器环境下的 Worker 脚本 URL。
+ * 在 Vite 依赖预构建目录中，`import.meta.url` 会被重写到 `node_modules/.vite/deps`，
+ * 但不会包含我们包内的 worker 产物，因此需要回退到包内真实路径。
+ */
+export function resolveBrowserWorkerURL(moduleUrl: string = import.meta.url): URL {
+  if (moduleUrl.includes(VITE_OPTIMIZED_DEPS_SEGMENT)) {
+    return new URL('../../@markdown-next/parser/dist/modules/parser.worker.mjs', moduleUrl);
+  }
+
+  return new URL(WORKER_MODULE_PATH, moduleUrl);
+}
+
+/**
  * 创建 Worker 实例
  */
 function createWorker(): Worker {
@@ -71,7 +87,7 @@ function createWorker(): Worker {
 
   if (env === 'browser') {
     // 浏览器环境：使用 Web Worker
-    return new Worker(new URL('./modules/parser.worker.mjs', import.meta.url), {
+    return new Worker(resolveBrowserWorkerURL(), {
       type: 'module',
     });
   }
@@ -81,7 +97,7 @@ function createWorker(): Worker {
     try {
       // eslint-disable-next-line no-undef
       const { Worker } = require('worker_threads');
-      return new Worker(new URL('./modules/parser.worker.mjs', import.meta.url));
+      return new Worker(new URL(WORKER_MODULE_PATH, import.meta.url));
     } catch {
       throw new Error(
         'Worker threads are not supported in this Node.js environment. ' +
@@ -121,6 +137,7 @@ export class ParserWorkerPool {
   private workerCount: number;
   private initialized = false;
   private initPromise: Promise<void> | null = null;
+  private completedTasks = 0;
   // eslint-disable-next-line no-unused-vars
   private pending: Array<(worker: WorkerState) => void> = [];
 
@@ -218,6 +235,7 @@ export class ParserWorkerPool {
     try {
       return await worker.proxy.parseToHTML(markdown);
     } finally {
+      this.completedTasks += 1;
       this.releaseWorker(worker);
     }
   }
@@ -232,6 +250,7 @@ export class ParserWorkerPool {
     try {
       return await worker.proxy.parseToHAST(markdown);
     } finally {
+      this.completedTasks += 1;
       this.releaseWorker(worker);
     }
   }
@@ -278,7 +297,36 @@ export class ParserWorkerPool {
       worker.terminate();
     }
     this.workers = [];
+    this.pending = [];
+    this.completedTasks = 0;
     this.initialized = false;
+  }
+
+  /**
+   * 兼容旧 API：终止 Worker 池
+   */
+  async terminate(): Promise<void> {
+    await this.destroy();
+  }
+
+  /**
+   * 兼容旧 API：获取统计信息
+   */
+  getStats(): {
+    activeWorkers: number;
+    idleWorkers: number;
+    queuedTasks: number;
+    completedTasks: number;
+  } {
+    const activeWorkers = this.workers.length;
+    const busyWorkers = this.workers.filter((w) => w.busy).length;
+
+    return {
+      activeWorkers,
+      idleWorkers: Math.max(activeWorkers - busyWorkers, 0),
+      queuedTasks: this.pending.length,
+      completedTasks: this.completedTasks,
+    };
   }
 
   /**

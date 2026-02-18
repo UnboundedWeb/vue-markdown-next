@@ -1,5 +1,6 @@
 import { Root } from 'hast';
 import type { ParserOptions } from './parser';
+export declare function resolveBrowserWorkerURL(moduleUrl?: string): URL;
 /**
  * Worker 池配置
  */
@@ -17,6 +18,9 @@ export declare class ParserWorkerPool {
   private workers;
   private workerCount;
   private initialized;
+  private initPromise;
+  private completedTasks;
+  private pending;
   constructor(options?: WorkerPoolOptions);
   /**
    * 初始化 Worker 池
@@ -64,10 +68,25 @@ export declare class ParserWorkerPool {
    */
   destroy(): Promise<void>;
   /**
+   * 兼容旧 API：终止 Worker 池
+   */
+  terminate(): Promise<void>;
+  /**
+   * 兼容旧 API：获取统计信息
+   */
+  getStats(): {
+    activeWorkers: number;
+    idleWorkers: number;
+    queuedTasks: number;
+    completedTasks: number;
+  };
+  /**
    * 获取 Worker 池信息
    */
   getPoolInfo(): {
     workerCount: number;
+    activeWorkers: number;
+    busyWorkers: number;
     maxWorkers: number;
     environment: 'browser' | 'node' | 'unknown';
     initialized: boolean;
