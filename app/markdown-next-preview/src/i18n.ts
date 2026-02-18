@@ -127,7 +127,8 @@ export const i18n = createI18n({
         run: '开始流式请求',
         stop: '停止',
         clear: '清空输出',
-        securityHint: '提示：API Key 仅保留在当前页面内存，不会写入本地存储。',
+        securityHint:
+          '提示：API Key 仅保留在当前页面内存，不会写入本地存储。若模型不支持自定义 temperature，会自动回退到默认值请求。',
         outputTitle: '实时渲染输出',
         outputDescription: '使用 @markdown-next/vue 的 streaming 模式渲染逐块增量内容。',
         chunkCount: 'Chunk 数',
@@ -200,7 +201,7 @@ export const i18n = createI18n({
         stop: 'Stop',
         clear: 'Clear Output',
         securityHint:
-          'Note: API key stays in page memory only and is never persisted to local storage.',
+          'Note: API key stays in page memory only and is never persisted. If a model rejects custom temperature, the request retries with default temperature.',
         outputTitle: 'Live Render Output',
         outputDescription:
           'Renders incremental markdown blocks using @markdown-next/vue streaming mode.',

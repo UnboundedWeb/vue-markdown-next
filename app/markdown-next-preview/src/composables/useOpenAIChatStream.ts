@@ -23,6 +23,20 @@ interface OpenAIStreamChunk {
   };
 }
 
+interface OpenAIErrorDetail {
+  message?: string;
+  type?: string;
+  param?: string;
+  code?: string;
+}
+
+interface OpenAIErrorPayload {
+  message: string;
+  type?: string;
+  param?: string;
+  code?: string;
+}
+
 function toChatCompletionsURL(apiBaseUrl: string): string {
   const normalized = apiBaseUrl.trim().replace(/\/+$/, '');
   if (normalized.endsWith('/chat/completions')) {
@@ -45,14 +59,35 @@ interface UseOpenAIChatStreamResult {
   clear: () => void;
 }
 
-async function readErrorMessage(response: globalThis.Response): Promise<string> {
+function shouldSendTemperature(temperature?: number): temperature is number {
+  return typeof temperature === 'number' && Number.isFinite(temperature) && temperature !== 1;
+}
+
+function formatOpenAIError(status: number, payload: OpenAIErrorPayload): string {
+  const details = [payload.code, payload.param].filter(Boolean).join(', ');
+  if (details.length > 0) {
+    return `OpenAI request failed (${status}) [${details}]: ${payload.message}`;
+  }
+  return `OpenAI request failed (${status}): ${payload.message}`;
+}
+
+function isUnsupportedTemperatureError(payload: OpenAIErrorPayload): boolean {
+  return payload.param === 'temperature' && payload.code === 'unsupported_value';
+}
+
+async function readErrorPayload(response: globalThis.Response): Promise<OpenAIErrorPayload> {
   const payload = await response.text();
-  if (payload.length === 0) return '';
+  if (payload.length === 0) return { message: 'No response body.' };
   try {
-    const parsed = JSON.parse(payload) as { error?: { message?: string } };
-    return parsed.error?.message ?? payload;
+    const parsed = JSON.parse(payload) as { error?: OpenAIErrorDetail };
+    return {
+      message: parsed.error?.message ?? payload,
+      type: parsed.error?.type,
+      param: parsed.error?.param,
+      code: parsed.error?.code,
+    };
   } catch {
-    return payload;
+    return { message: payload };
   }
 }
 
@@ -111,37 +146,54 @@ export function useOpenAIChatStream(): UseOpenAIChatStreamResult {
     activeController = controller;
 
     try {
-      const response = await globalThis.fetch(toChatCompletionsURL(apiBaseUrl), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          stream: true,
-          temperature: request.temperature ?? 0.7,
-          messages: [
-            ...(systemPrompt
-              ? [
-                  {
-                    role: 'system',
-                    content: systemPrompt,
-                  },
-                ]
-              : []),
-            {
-              role: 'user',
-              content: userPrompt,
-            },
-          ],
-        }),
-        signal: controller.signal,
-      });
+      const endpoint = toChatCompletionsURL(apiBaseUrl);
+      const messages = [
+        ...(systemPrompt
+          ? [
+              {
+                role: 'system',
+                content: systemPrompt,
+              } as const,
+            ]
+          : []),
+        {
+          role: 'user',
+          content: userPrompt,
+        } as const,
+      ];
+      const requestStream = async (includeTemperature: boolean): Promise<globalThis.Response> => {
+        return globalThis.fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            stream: true,
+            ...(includeTemperature && shouldSendTemperature(request.temperature)
+              ? { temperature: request.temperature }
+              : {}),
+            messages,
+          }),
+          signal: controller.signal,
+        });
+      };
+
+      const wantsCustomTemperature = shouldSendTemperature(request.temperature);
+      let response = await requestStream(wantsCustomTemperature);
+      if (!response.ok) {
+        const firstError = await readErrorPayload(response);
+        if (wantsCustomTemperature && isUnsupportedTemperatureError(firstError)) {
+          response = await requestStream(false);
+        } else {
+          throw new Error(formatOpenAIError(response.status, firstError));
+        }
+      }
 
       if (!response.ok) {
-        const details = await readErrorMessage(response);
-        throw new Error(`OpenAI request failed (${response.status}): ${details}`);
+        const retryError = await readErrorPayload(response);
+        throw new Error(formatOpenAIError(response.status, retryError));
       }
 
       if (!response.body) {

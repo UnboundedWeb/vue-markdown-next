@@ -13,7 +13,7 @@ const systemPrompt = ref('You are a concise assistant. Always respond in markdow
 const userPrompt = ref(
   '写一段带有二级标题、列表、代码块和数学公式的中文 markdown，主题是“流式渲染测试”。'
 );
-const temperature = ref(0.7);
+const temperature = ref(1);
 const showApiKey = ref(false);
 
 const { output, isStreaming, error, chunkCount, elapsedMs, start, stop, clear } =
