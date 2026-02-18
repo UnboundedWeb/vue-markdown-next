@@ -1,14 +1,14 @@
 import { onBeforeUnmount, ref, shallowRef, unref, watch } from 'vue';
 import type { Ref, ShallowRef, VNodeChild } from 'vue';
 import type { MarkdownRenderOptions, UseMarkdownResult } from '../types';
+import type { MarkdownRenderCallback } from '../streamdown/types';
 import { toError } from '../utils/toError';
 
 export type MaybeRef<T> = T | Ref<T>;
 
 export function useMarkdownRender(
   markdown: MaybeRef<string>,
-  // eslint-disable-next-line no-unused-vars
-  render: (value: string, options?: MarkdownRenderOptions) => Promise<VNodeChild>,
+  render: MarkdownRenderCallback,
   renderOptions?: MaybeRef<MarkdownRenderOptions | undefined>
 ): UseMarkdownResult<ShallowRef<VNodeChild | null>> {
   const content = shallowRef<VNodeChild | null>(null);

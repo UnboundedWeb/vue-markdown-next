@@ -1,7 +1,6 @@
 import type { Root } from 'hast';
 import remend from 'remend';
 import { Fragment, h } from 'vue';
-import type { VNodeChild } from 'vue';
 import { renderHastToVue } from '../render/hastToVue';
 import type {
   MarkdownRenderMode,
@@ -9,11 +8,7 @@ import type {
   MarkdownStreamdownOptions,
 } from '../types';
 import { parseMarkdownIntoBlocks } from './parseMarkdownIntoBlocks';
-
-interface HASTParser {
-  // eslint-disable-next-line no-unused-vars
-  parseToHAST(markdown: string): Promise<Root>;
-}
+import type { StreamdownHASTParser, StreamdownRenderer } from './types';
 
 interface CachedBlock {
   source: string;
@@ -23,12 +18,6 @@ interface CachedBlock {
 interface StreamdownEdges {
   prefix: number;
   suffix: number;
-}
-
-export interface StreamdownRenderer {
-  // eslint-disable-next-line no-unused-vars
-  render(markdown: string, options?: MarkdownRenderOptions): Promise<VNodeChild>;
-  reset(): void;
 }
 
 function resolveMode(options?: MarkdownRenderOptions): MarkdownRenderMode {
@@ -75,7 +64,7 @@ function getReusableEdges(
 async function parseBlocksWithCache(
   sources: readonly string[],
   previous: readonly CachedBlock[],
-  parser: HASTParser
+  parser: StreamdownHASTParser
 ): Promise<CachedBlock[]> {
   if (sources.length === 0) return [];
 
@@ -122,7 +111,7 @@ async function parseBlocksWithCache(
   return nextBlocks as CachedBlock[];
 }
 
-export function createStreamdownRenderer(parser: HASTParser): StreamdownRenderer {
+export function createStreamdownRenderer(parser: StreamdownHASTParser): StreamdownRenderer {
   let cachedBlocks: CachedBlock[] = [];
 
   return {
