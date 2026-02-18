@@ -1,6 +1,6 @@
-import { defineComponent, onBeforeUnmount, provide, computed } from 'vue';
+import { defineComponent, onBeforeUnmount, onMounted, provide, computed } from 'vue';
 import type { DefineComponent, PropType } from 'vue';
-import type { ParserOptions } from '@markdown-next/parser';
+import type { ParserOptions, ParserWorkerPool } from '@markdown-next/parser';
 import { createWorkerPool } from '@markdown-next/parser';
 import { markdownWorkerContextKey } from '../context';
 import type {
@@ -13,6 +13,9 @@ import type {
 
 export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defineComponent({
   name: 'MarkdownWorkerPoll',
+  emits: {
+    ready: (pool: ParserWorkerPool) => pool != null,
+  },
   props: {
     parserOptions: {
       type: Object as PropType<ParserOptions>,
@@ -74,7 +77,7 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
       default: undefined,
     },
   },
-  setup(props, { slots }) {
+  setup(props, { slots, emit, expose }) {
     const poolOptions: ParserOptions & { workerCount?: number } = {
       ...(props.parserOptions ?? {}),
     };
@@ -86,6 +89,14 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
     if (props.mathJaxConfig) poolOptions.mathJaxConfig = props.mathJaxConfig;
 
     const pool = createWorkerPool(poolOptions);
+
+    expose({
+      pool,
+      getPoolInfo: () => pool.getPoolInfo(),
+      getStats: () => pool.getStats(),
+      terminate: () => pool.terminate(),
+      destroy: () => pool.destroy(),
+    });
 
     const renderOptions = computed<MarkdownRenderOptions | undefined>(() => {
       if (
@@ -114,6 +125,10 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
       pool,
       renderOptions,
       forceRenderOptions,
+    });
+
+    onMounted(() => {
+      emit('ready', pool);
     });
 
     onBeforeUnmount(() => {
