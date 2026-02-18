@@ -1,15 +1,32 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { MarkdownRenderer, MarkdownWorkerPoll } from '@markdown-next/vue';
 import { defaultParserOptions } from '../constants/defaultParserOptions';
 import { useOpenAIChatStream } from '../composables/useOpenAIChatStream';
 
+const OPENAI_API_KEY_STORAGE_KEY = 'markdown-next-preview.openai.apiKey';
+
+function unwrapOuterMarkdownFence(markdown: string): string {
+  if (!markdown) return markdown;
+
+  // Stream output is often wrapped as ```markdown ... ``` by some models.
+  // Unwrap it so preview can render markdown directly instead of showing raw text.
+  const fenceStart = markdown.match(/^\s*```(?:markdown|md)?\s*\n/i);
+  if (!fenceStart) return markdown;
+
+  let value = markdown.slice(fenceStart[0].length);
+  value = value.replace(/\n```[\t ]*$/m, '');
+  return value;
+}
+
 const { t } = useI18n();
 const apiBaseUrl = ref('https://api.openai.com/v1');
 const apiKey = ref('');
-const model = ref('gpt-4.1-mini');
-const systemPrompt = ref('You are a concise assistant. Always respond in markdown.');
+const model = ref('gpt-5-nano-2025-08-07');
+const systemPrompt = ref(
+  'You are a concise assistant. Always respond in markdown. Do not wrap the whole answer in a markdown code fence.'
+);
 const userPrompt = ref(
   '写一段带有二级标题、列表、代码块和数学公式的中文 markdown，主题是“流式渲染测试”。'
 );
@@ -19,7 +36,26 @@ const showApiKey = ref(false);
 const { output, isStreaming, error, chunkCount, elapsedMs, start, stop, clear } =
   useOpenAIChatStream();
 
-const hasOutput = computed(() => output.value.trim().length > 0);
+const renderedMarkdown = computed(() => unwrapOuterMarkdownFence(output.value));
+const hasOutput = computed(() => renderedMarkdown.value.trim().length > 0);
+
+onMounted(() => {
+  if (typeof window === 'undefined') return;
+  const rememberedApiKey = globalThis.localStorage.getItem(OPENAI_API_KEY_STORAGE_KEY);
+  if (rememberedApiKey) {
+    apiKey.value = rememberedApiKey;
+  }
+});
+
+watch(apiKey, (next) => {
+  if (typeof window === 'undefined') return;
+  const trimmed = next.trim();
+  if (trimmed.length === 0) {
+    globalThis.localStorage.removeItem(OPENAI_API_KEY_STORAGE_KEY);
+    return;
+  }
+  globalThis.localStorage.setItem(OPENAI_API_KEY_STORAGE_KEY, trimmed);
+});
 
 const runStream = async (): Promise<void> => {
   await start({
@@ -133,7 +169,7 @@ const clearOutput = (): void => {
             class="preview stream-preview"
             mode="streaming"
             :streamdown="{ parseIncompleteMarkdown: true }"
-            :markdown="output"
+            :markdown="renderedMarkdown"
           />
         </MarkdownWorkerPoll>
       </div>
