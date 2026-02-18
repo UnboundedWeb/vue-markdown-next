@@ -53,8 +53,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          # rolldown-vite (used by markdown-next-preview / e2e) requires Node 20.19+ or 22.12+
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify Node runtime
+        run: |
+          echo "Node: $(node -v)"
+          node -e "const [major,minor] = process.versions.node.split('.').map(Number); const ok = major > 22 || (major === 22 && minor >= 12) || (major === 20 && minor >= 19); if (!ok) { console.error('Node version must be >=20.19 or >=22.12 for current Vite toolchain.'); process.exit(1); }"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
