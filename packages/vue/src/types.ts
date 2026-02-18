@@ -4,8 +4,19 @@ import type { ParserOptions } from '@markdown-next/parser';
 export type MarkdownComponent = Component | FunctionalComponent | string;
 export type MarkdownComponents = Record<string, MarkdownComponent>;
 export type LoadingSlot = Component | FunctionalComponent | (() => VNodeChild);
+export type MarkdownRenderMode = 'static' | 'streaming';
+
+export interface MarkdownStreamdownOptions {
+  /**
+   * Repairs incomplete markdown markers while streaming.
+   * @default true
+   */
+  parseIncompleteMarkdown?: boolean;
+}
 
 export interface MarkdownRenderOptions {
+  mode?: MarkdownRenderMode;
+  streamdown?: MarkdownStreamdownOptions;
   components?: MarkdownComponents;
   codeRenderer?: MarkdownComponent;
   dynamic?: boolean;

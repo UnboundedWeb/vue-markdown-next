@@ -7,6 +7,7 @@ export type MaybeRef<T> = T | Ref<T>;
 
 export function useMarkdownRender(
   markdown: MaybeRef<string>,
+  // eslint-disable-next-line no-unused-vars
   render: (value: string, options?: MarkdownRenderOptions) => Promise<VNodeChild>,
   renderOptions?: MaybeRef<MarkdownRenderOptions | undefined>
 ): UseMarkdownResult<ShallowRef<VNodeChild | null>> {
@@ -37,8 +38,9 @@ export function useMarkdownRender(
   };
 
   const schedule = (value: string, options?: MarkdownRenderOptions): void => {
-    const dynamic = options?.dynamic ?? false;
-    const debounceMs = options?.debounceMs ?? 250;
+    const mode = options?.mode ?? 'static';
+    const dynamic = options?.dynamic ?? mode === 'streaming';
+    const debounceMs = options?.debounceMs ?? (mode === 'streaming' ? 80 : 250);
 
     if (timer != null) {
       globalThis.clearTimeout(timer);

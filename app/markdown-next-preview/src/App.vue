@@ -1,29 +1,59 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import EditorPane from './components/EditorPane.vue';
-import LivePreviewPane from './components/LivePreviewPane.vue';
-import CustomPreviewPane from './components/CustomPreviewPane.vue';
-import { markdownSamples, type Locale } from './i18n';
+import type { Locale } from './i18n';
+import MarkdownPlaygroundPage from './pages/MarkdownPlaygroundPage.vue';
+import OpenAIStreamDemoPage from './pages/OpenAIStreamDemoPage.vue';
+
+type PreviewPage = 'playground' | 'stream';
 
 const { t, locale } = useI18n();
-const countPoll = 1;
-const markdown = ref(markdownSamples[locale.value as Locale]);
 const currentLocale = computed(() => locale.value as Locale);
+
+const resolvePageFromHash = (): PreviewPage => {
+  if (typeof window === 'undefined') return 'playground';
+  return window.location.hash === '#stream' ? 'stream' : 'playground';
+};
+
+const currentPage = ref<PreviewPage>(resolvePageFromHash());
+
+const syncPageFromHash = (): void => {
+  currentPage.value = resolvePageFromHash();
+};
+
+onMounted(() => {
+  syncPageFromHash();
+  window.addEventListener('hashchange', syncPageFromHash);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', syncPageFromHash);
+});
+
+const setPage = (page: PreviewPage): void => {
+  currentPage.value = page;
+  if (typeof window === 'undefined') return;
+  const nextHash = page === 'stream' ? '#stream' : '#playground';
+  if (window.location.hash !== nextHash) {
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}${window.location.search}${nextHash}`
+    );
+  }
+};
+
+const pageTabs = computed(() => [
+  { value: 'playground' as const, label: t('navigation.playground') },
+  { value: 'stream' as const, label: t('navigation.stream') },
+]);
 
 const localeOptions = computed(() => [
   { value: 'zh', label: t('language.zh') },
   { value: 'en', label: t('language.en') },
 ]);
 
-watch(locale, (next, prev) => {
-  const prevSample = markdownSamples[prev as Locale];
-  if (markdown.value === prevSample) {
-    markdown.value = markdownSamples[next as Locale];
-  }
-});
-
-const setLocale = (value: Locale) => {
+const setLocale = (value: Locale): void => {
   locale.value = value;
 };
 </script>
@@ -35,7 +65,22 @@ const setLocale = (value: Locale) => {
         <p class="eyebrow">{{ t('app.eyebrow') }}</p>
         <h1>{{ t('app.title') }}</h1>
         <p class="subtitle">{{ t('app.subtitle') }}</p>
+        <div class="page-tabs" role="tablist" :aria-label="t('navigation.label')">
+          <button
+            v-for="tab in pageTabs"
+            :key="tab.value"
+            class="page-tab"
+            :class="{ active: currentPage === tab.value }"
+            type="button"
+            role="tab"
+            :aria-selected="currentPage === tab.value"
+            @click="setPage(tab.value)"
+          >
+            {{ tab.label }}
+          </button>
+        </div>
       </div>
+
       <div class="hero-actions">
         <div class="language-switch">
           <span class="language-label">{{ t('language.label') }}</span>
@@ -57,11 +102,8 @@ const setLocale = (value: Locale) => {
       </div>
     </header>
 
-    <main class="workspace">
-      <EditorPane v-model="markdown" />
-      <LivePreviewPane :markdown="markdown" :worker-count="countPoll" />
-      <CustomPreviewPane :markdown="markdown" :worker-count="countPoll" />
-    </main>
+    <MarkdownPlaygroundPage v-if="currentPage === 'playground'" />
+    <OpenAIStreamDemoPage v-else />
   </div>
 </template>
 
@@ -69,49 +111,80 @@ const setLocale = (value: Locale) => {
 .page {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 20px;
   min-height: 100vh;
-  padding: 36px clamp(20px, 6vw, 72px) 64px;
+  padding: 32px clamp(18px, 4vw, 52px) 56px;
 }
 
 .hero {
   display: flex;
   justify-content: space-between;
-  gap: 24px;
-  padding: 28px 32px;
-  border-radius: 24px;
-  background: linear-gradient(120deg, rgba(255, 255, 255, 0.82), rgba(255, 243, 224, 0.9));
-  box-shadow: 0 18px 50px rgba(20, 12, 4, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  gap: 22px;
+  padding: 24px 28px;
+  border-radius: 22px;
+  background: linear-gradient(
+    128deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 242, 224, 0.94) 48%,
+    rgba(255, 231, 204, 0.95) 100%
+  );
+  box-shadow: 0 16px 36px rgba(38, 20, 2, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.9);
 }
 
 .hero-actions {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
 }
 
 .eyebrow {
-  margin: 0 0 8px;
+  margin: 0;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
-  font-size: 12px;
+  letter-spacing: 0.18em;
+  font-size: 11px;
   font-weight: 700;
-  color: #7c3f00;
+  color: #7b3b00;
 }
 
 h1 {
-  margin: 0;
-  font-size: clamp(28px, 4vw, 44px);
-  color: #1c1208;
+  margin: 6px 0 0;
+  font-size: clamp(26px, 3.2vw, 40px);
+  color: var(--text-primary);
 }
 
 .subtitle {
-  margin: 10px 0 0;
-  max-width: 520px;
-  color: #4a3120;
-  font-size: 16px;
-  line-height: 1.6;
+  margin: 8px 0 0;
+  max-width: 660px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.page-tabs {
+  margin-top: 16px;
+  display: inline-flex;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--border-color);
+}
+
+.page-tab {
+  border: 1px solid transparent;
+  background: transparent;
+  color: #5b3b22;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.page-tab.active {
+  background: #19140e;
+  border-color: #19140e;
+  color: #ffeecf;
 }
 
 .language-switch {
@@ -161,31 +234,25 @@ h1 {
 
 .badge {
   align-self: flex-start;
-  padding: 10px 16px;
+  padding: 10px 14px;
   border-radius: 999px;
   background: #1b120a;
   color: #fff1dc;
-  font-size: 13px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.workspace {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
 }
 
 .pane {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 24px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 16px 40px rgba(16, 12, 6, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  min-height: 520px;
+  gap: 14px;
+  padding: 22px;
+  border-radius: 18px;
+  background: var(--surface-card);
+  box-shadow: 0 14px 36px rgba(16, 12, 6, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  min-height: 480px;
 }
 
 .pane-header {
@@ -203,8 +270,24 @@ h1 {
 
 .pane-header p {
   margin: 6px 0 0;
-  color: #6b4c35;
+  color: var(--text-muted);
   font-size: 14px;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #ffe5c6;
+  color: #934604;
+}
+
+.status.active {
+  background: #1f1a12;
+  color: #ffe7c0;
 }
 
 .toolbar {
@@ -233,7 +316,7 @@ h1 {
   width: 100%;
   padding: 18px;
   border-radius: 16px;
-  border: 1px solid rgba(28, 18, 8, 0.15);
+  border: 1px solid var(--border-color);
   background: #fffdf8;
   font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, SFMono-Regular, Consolas, monospace;
   font-size: 14px;
@@ -244,18 +327,14 @@ h1 {
 }
 
 .editor:focus {
-  outline: 2px solid rgba(199, 119, 42, 0.6);
+  outline: 2px solid var(--focus-ring);
 }
 
 .preview {
   flex: 1;
-  padding: 12px 6px 0;
+  padding: 10px 4px 0;
   overflow: auto;
   background: transparent;
-}
-
-.custom-preview-pane {
-  grid-column: 1 / -1;
 }
 
 .preview-custom {
@@ -267,7 +346,6 @@ h1 {
   padding-bottom: 6px;
   border-bottom: 2px solid rgba(247, 163, 70, 0.35);
   color: #6b3a0b;
-  letter-spacing: 0.02em;
 }
 
 .preview-custom blockquote.custom-quote {
@@ -287,15 +365,8 @@ h1 {
   overflow: auto;
 }
 
-.status {
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  background: rgba(255, 170, 86, 0.2);
-  color: #b05a00;
+.custom-preview-pane {
+  grid-column: 1 / -1;
 }
 
 @media (max-width: 1024px) {
@@ -307,10 +378,6 @@ h1 {
     width: 100%;
     justify-content: space-between;
     flex-wrap: wrap;
-  }
-
-  .workspace {
-    grid-template-columns: 1fr;
   }
 
   .pane {

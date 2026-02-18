@@ -164,6 +164,12 @@ importers:
       hast-util-to-jsx-runtime:
         specifier: ^2.3.0
         version: 2.3.6
+      marked:
+        specifier: ^17.0.3
+        version: 17.0.3
+      remend:
+        specifier: ^1.2.0
+        version: 1.2.0
     devDependencies:
       '@types/hast':
         specifier: ^3.0.4
@@ -2277,6 +2283,11 @@ packages:
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
 
+  marked@17.0.3:
+    resolution: {integrity: sha512-jt1v2ObpyOKR8p4XaUJVk3YWRJ5n+i4+rjQopxvV32rSndTJXvIzuUdWWIy/1pFQMkQmvTXawzDNqOH/CUmx6A==}
+    engines: {node: '>= 20'}
+    hasBin: true
+
   mathjax-full@3.2.2:
     resolution: {integrity: sha512-+LfG9Fik+OuI8SLwsiR02IVdjcnRCy5MufYLi0C3TdMT56L/pjB0alMVGgoWJF8pN9Rc7FESycZB9BMNWIid5w==}
     deprecated: Version 4 replaces this package with the scoped package @mathjax/src
@@ -2670,6 +2681,9 @@ packages:
 
   remark-stringify@11.0.0:
     resolution: {integrity: sha512-1OSmLd3awB/t8qdoEOMazZkNsfVTeY4fTsgzcQFdXNq8ToTN4ZGwrMnlda4K6smTFKD+GRV6O48i6Z4iKgPPpw==}
+
+  remend@1.2.0:
+    resolution: {integrity: sha512-NbKrdWweTRuByPYErzQCNpNtsR9M1QQ0hK2UzmnmlSaEqHnkQ5Korlyi8KpdbOJ0rImJfRy4EAY0uDxYnL9Plw==}
 
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
@@ -5301,6 +5315,8 @@ snapshots:
 
   markdown-table@3.0.4: {}
 
+  marked@17.0.3: {}
+
   mathjax-full@3.2.2:
     dependencies:
       esm: 3.2.25
@@ -5945,6 +5961,8 @@ snapshots:
       '@types/mdast': 4.0.4
       mdast-util-to-markdown: 2.1.2
       unified: 11.0.5
+
+  remend@1.2.0: {}
 
   require-directory@2.1.1: {}
 

@@ -7,7 +7,9 @@ import type {
   LoadingSlot,
   MarkdownComponent,
   MarkdownComponents,
+  MarkdownRenderMode,
   MarkdownRenderOptions,
+  MarkdownStreamdownOptions,
   MarkdownWorkerPollProps,
 } from '../types';
 
@@ -61,6 +63,16 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
       required: false,
       default: undefined,
     },
+    mode: {
+      type: String as PropType<MarkdownRenderMode>,
+      required: false,
+      default: undefined,
+    },
+    streamdown: {
+      type: Object as PropType<MarkdownStreamdownOptions>,
+      required: false,
+      default: undefined,
+    },
     dynamic: {
       type: Boolean,
       required: false,
@@ -102,6 +114,8 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
       if (
         props.components == null &&
         props.codeRenderer == null &&
+        props.mode == null &&
+        props.streamdown == null &&
         props.dynamic == null &&
         props.debounceMs == null &&
         props.loadingSlot == null
@@ -109,12 +123,13 @@ export const MarkdownWorkerPoll: DefineComponent<MarkdownWorkerPollProps> = defi
         return undefined;
       }
 
-      const options: MarkdownRenderOptions = {
-        dynamic: props.dynamic ?? false,
-        debounceMs: props.debounceMs ?? 250,
-      };
+      const options: MarkdownRenderOptions = {};
       if (props.components) options.components = props.components;
       if (props.codeRenderer) options.codeRenderer = props.codeRenderer;
+      if (props.mode != null) options.mode = props.mode;
+      if (props.streamdown) options.streamdown = props.streamdown;
+      if (props.dynamic != null) options.dynamic = props.dynamic;
+      if (props.debounceMs != null) options.debounceMs = props.debounceMs;
       if (props.loadingSlot) options.loadingSlot = props.loadingSlot;
       return options;
     });

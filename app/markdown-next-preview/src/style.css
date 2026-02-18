@@ -1,10 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
+  --text-primary: #21160c;
+  --text-muted: #64452d;
+  --surface-card: rgba(255, 255, 255, 0.86);
+  --surface-panel: #fffcf6;
+  --card-highlight: rgba(255, 244, 227, 0.72);
+  --border-color: rgba(90, 56, 24, 0.2);
+  --focus-ring: rgba(198, 116, 36, 0.62);
   font-family: 'Space Grotesk', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #1f160e;
+  color: var(--text-primary);
   background-color: #f7efe5;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -22,9 +29,10 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: radial-gradient(circle at top left, #fff8ec 0%, rgba(255, 244, 221, 0.4) 40%, transparent 65%),
-    radial-gradient(circle at 20% 30%, rgba(255, 214, 170, 0.4) 0%, transparent 55%),
-    linear-gradient(160deg, #f7efe5, #f2e2cc);
+  background:
+    radial-gradient(circle at 85% 8%, rgba(255, 199, 122, 0.34) 0%, transparent 34%),
+    radial-gradient(circle at 8% 14%, rgba(255, 239, 212, 0.78) 0%, transparent 46%),
+    linear-gradient(160deg, #f7efe5, #efddc3);
 }
 
 a {

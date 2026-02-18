@@ -31,13 +31,25 @@ defineComponent({
       required: false,
       default: undefined,
     },
+    mode: {
+      type: String as PropType<MarkdownRenderMode>,
+      required: false,
+      default: 'static',
+    },
+    streamdown: {
+      type: Object as PropType<MarkdownStreamdownOptions>,
+      required: false,
+      default: undefined,
+    },
     dynamic: {
       type: Boolean,
-      default: false,
+      required: false,
+      default: undefined,
     },
     debounceMs: {
       type: Number,
-      default: 250,
+      required: false,
+      default: undefined,
     },
     loadingSlot: {
       type: [Object, Function] as PropType<LoadingSlot>,
@@ -50,15 +62,17 @@ defineComponent({
 
 **Props:**
 
-| Prop            | Type                 | Required | Default     | Description                |
-| --------------- | -------------------- | -------- | ----------- | -------------------------- |
-| `markdown`      | `string`             | Yes      | -           | Markdown content to render |
-| `parserOptions` | `ParserOptions`      | No       | `undefined` | Parser configuration       |
-| `components`    | `MarkdownComponents` | No       | `undefined` | Custom component overrides |
-| `codeRenderer`  | `MarkdownComponent`  | No       | `undefined` | Custom code renderer       |
-| `dynamic`       | `boolean`            | No       | `false`     | Enable reactive updates    |
-| `debounceMs`    | `number`             | No       | `250`       | Debounce delay (ms)        |
-| `loadingSlot`   | `LoadingSlot`        | No       | `undefined` | Custom loading component   |
+| Prop            | Type                        | Required | Default     | Description                 |
+| --------------- | --------------------------- | -------- | ----------- | --------------------------- |
+| `markdown`      | `string`                    | Yes      | -           | Markdown content to render  |
+| `parserOptions` | `ParserOptions`             | No       | `undefined` | Parser configuration        |
+| `components`    | `MarkdownComponents`        | No       | `undefined` | Custom component overrides  |
+| `codeRenderer`  | `MarkdownComponent`         | No       | `undefined` | Custom code renderer        |
+| `mode`          | `'static' \| 'streaming'`   | No       | `'static'`  | Rendering mode              |
+| `streamdown`    | `MarkdownStreamdownOptions` | No       | `undefined` | Streaming behavior options  |
+| `dynamic`       | `boolean`                   | No       | mode-aware  | Whether to debounce updates |
+| `debounceMs`    | `number`                    | No       | mode-aware  | Debounce delay (ms)         |
+| `loadingSlot`   | `LoadingSlot`               | No       | `undefined` | Custom loading component    |
 
 **Emits:**
 
@@ -78,19 +92,42 @@ defineComponent({
   props: {
     workerCount: {
       type: Number,
-      default: 1,
+      required: true,
     },
     parserOptions: {
       type: Object as PropType<ParserOptions>,
+      required: false,
       default: undefined,
     },
-    renderOptions: {
-      type: Object as PropType<MarkdownRenderOptions>,
+    components: {
+      type: Object as PropType<MarkdownComponents>,
+      required: false,
       default: undefined,
     },
-    forceRenderOptions: {
+    codeRenderer: {
+      type: [Object, Function, String] as PropType<MarkdownComponent>,
+      required: false,
+      default: undefined,
+    },
+    mode: {
+      type: String as PropType<MarkdownRenderMode>,
+      required: false,
+      default: undefined,
+    },
+    streamdown: {
+      type: Object as PropType<MarkdownStreamdownOptions>,
+      required: false,
+      default: undefined,
+    },
+    dynamic: {
       type: Boolean,
-      default: false,
+      required: false,
+      default: undefined,
+    },
+    debounceMs: {
+      type: Number,
+      required: false,
+      default: undefined,
     },
     loadingSlot: {
       type: [Object, Function] as PropType<LoadingSlot>,
@@ -103,13 +140,17 @@ defineComponent({
 
 **Props:**
 
-| Prop                 | Type                    | Required | Default     | Description               |
-| -------------------- | ----------------------- | -------- | ----------- | ------------------------- |
-| `workerCount`        | `number`                | No       | `1`         | Number of workers         |
-| `parserOptions`      | `ParserOptions`         | No       | `undefined` | Parser configuration      |
-| `renderOptions`      | `MarkdownRenderOptions` | No       | `undefined` | Render options            |
-| `forceRenderOptions` | `boolean`               | No       | `false`     | Force options on children |
-| `loadingSlot`        | `LoadingSlot`           | No       | `undefined` | Custom loading component  |
+| Prop            | Type                        | Required | Default     | Description                            |
+| --------------- | --------------------------- | -------- | ----------- | -------------------------------------- |
+| `workerCount`   | `number`                    | Yes      | -           | Number of workers                      |
+| `parserOptions` | `ParserOptions`             | No       | `undefined` | Parser configuration                   |
+| `components`    | `MarkdownComponents`        | No       | `undefined` | Force component overrides for children |
+| `codeRenderer`  | `MarkdownComponent`         | No       | `undefined` | Force code renderer for children       |
+| `mode`          | `'static' \| 'streaming'`   | No       | `undefined` | Force rendering mode for children      |
+| `streamdown`    | `MarkdownStreamdownOptions` | No       | `undefined` | Force streamdown behavior for children |
+| `dynamic`       | `boolean`                   | No       | `undefined` | Force debounce scheduling behavior     |
+| `debounceMs`    | `number`                    | No       | `undefined` | Force debounce delay (ms)              |
+| `loadingSlot`   | `LoadingSlot`               | No       | `undefined` | Custom loading component               |
 
 **Slots:**
 
@@ -169,7 +210,7 @@ const markdown = ref('# Hello World');
 const { content, loading, error } = useMarkdownParser(
   markdown,
   { extendedGrammar: ['gfm'] },
-  { dynamic: true }
+  { mode: 'streaming' }
 );
 ```
 
@@ -203,7 +244,9 @@ import { MarkdownWorkerPool } from '@markdown-next/parser';
 const pool = new MarkdownWorkerPool({ workerCount: 2 });
 const markdown = ref('# Hello');
 
-const { content, loading, error } = useMarkdownWorkerPool(markdown, pool, { dynamic: true });
+const { content, loading, error } = useMarkdownWorkerPool(markdown, pool, {
+  mode: 'streaming',
+});
 
 // Remember to terminate the pool
 onUnmounted(() => {
@@ -265,12 +308,48 @@ type LoadingSlot = Component | FunctionalComponent | (() => VNodeChild);
 
 Used to customize the loading state displayed while markdown content is being parsed. Can be a Vue component, functional component, or a function that returns a VNode.
 
+### MarkdownRenderMode
+
+Rendering mode used by `MarkdownRenderer`.
+
+```ts
+type MarkdownRenderMode = 'static' | 'streaming';
+```
+
+- `static`: render the full markdown document as a single parse unit.
+- `streaming`: streamdown mode, parse markdown by blocks and reuse unchanged blocks.
+
+### MarkdownStreamdownOptions
+
+Streamdown options used when `mode` is `streaming`.
+
+```ts
+interface MarkdownStreamdownOptions {
+  /**
+   * Repairs incomplete markdown markers while streaming.
+   * @default true
+   */
+  parseIncompleteMarkdown?: boolean;
+}
+```
+
 ### MarkdownRenderOptions
 
 Options for markdown rendering.
 
 ```ts
 interface MarkdownRenderOptions {
+  /**
+   * Rendering mode.
+   * @default 'static'
+   */
+  mode?: MarkdownRenderMode;
+
+  /**
+   * Streamdown options.
+   */
+  streamdown?: MarkdownStreamdownOptions;
+
   /**
    * Custom component overrides
    */
@@ -282,14 +361,14 @@ interface MarkdownRenderOptions {
   codeRenderer?: MarkdownComponent;
 
   /**
-   * Enable reactive updates
-   * @default false
+   * Whether to debounce updates.
+   * @default false in static mode, true in streaming mode
    */
   dynamic?: boolean;
 
   /**
-   * Debounce delay in milliseconds
-   * @default 250
+   * Debounce delay in milliseconds.
+   * @default 250 in static mode, 80 in streaming mode
    */
   debounceMs?: number;
 
@@ -308,6 +387,8 @@ Props interface for MarkdownRenderer component.
 interface MarkdownRendererProps {
   markdown: string;
   parserOptions?: ParserOptions;
+  mode?: MarkdownRenderMode;
+  streamdown?: MarkdownStreamdownOptions;
   components?: MarkdownComponents;
   codeRenderer?: MarkdownComponent;
   dynamic?: boolean;
@@ -321,16 +402,15 @@ interface MarkdownRendererProps {
 Props interface for MarkdownWorkerPoll component.
 
 ```ts
-interface MarkdownWorkerPollProps {
-  workerCount?: number;
+interface MarkdownWorkerPollProps extends MarkdownRenderOptions {
   parserOptions?: ParserOptions;
-  renderOptions?: MarkdownRenderOptions;
-  forceRenderOptions?: boolean;
-  components?: MarkdownComponents;
-  codeRenderer?: MarkdownComponent;
-  dynamic?: boolean;
-  debounceMs?: number;
-  loadingSlot?: LoadingSlot;
+  workerCount?: number;
+  customTags?: string[];
+  extendedGrammar?: ParserOptions['extendedGrammar'];
+  remarkPlugins?: ParserOptions['remarkPlugins'];
+  rehypePlugins?: ParserOptions['rehypePlugins'];
+  mathJaxConfig?: ParserOptions['mathJaxConfig'];
+  supportsLaTeX?: ParserOptions['supportsLaTeX'];
 }
 ```
 
