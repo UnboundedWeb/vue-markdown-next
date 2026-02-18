@@ -1,8 +1,9 @@
 import { createParser } from '@markdown-next/parser';
 import type { ParserOptions } from '@markdown-next/parser';
 import type { MarkdownRenderOptions, UseMarkdownResult } from '../types';
+import { onBeforeUnmount } from 'vue';
 import type { ShallowRef, VNodeChild } from 'vue';
-import { renderHastToVue } from '../render/hastToVue';
+import { createStreamdownRenderer } from '../streamdown/createStreamdownRenderer';
 import { useMarkdownRender, type MaybeRef } from './useMarkdownRender';
 
 export function useMarkdownParser(
@@ -11,13 +12,17 @@ export function useMarkdownParser(
   renderOptions?: MaybeRef<MarkdownRenderOptions | undefined>
 ): UseMarkdownResult<ShallowRef<VNodeChild | null>> {
   const parser = createParser(parserOptions ?? {});
+  const streamdown = createStreamdownRenderer({
+    parseToHAST: (value: string) => parser.parseToHAST(value),
+  });
+
+  onBeforeUnmount(() => {
+    streamdown.reset();
+  });
 
   return useMarkdownRender(
     markdown,
-    async (value, options) => {
-      const tree = await parser.parseToHAST(value);
-      return renderHastToVue(tree, options);
-    },
+    (value, options) => streamdown.render(value, options),
     renderOptions
   );
 }

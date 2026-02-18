@@ -1,13 +1,14 @@
 import { onBeforeUnmount, ref, shallowRef, unref, watch } from 'vue';
 import type { Ref, ShallowRef, VNodeChild } from 'vue';
 import type { MarkdownRenderOptions, UseMarkdownResult } from '../types';
+import type { MarkdownRenderCallback } from '../streamdown/types';
 import { toError } from '../utils/toError';
 
 export type MaybeRef<T> = T | Ref<T>;
 
 export function useMarkdownRender(
   markdown: MaybeRef<string>,
-  render: (value: string, options?: MarkdownRenderOptions) => Promise<VNodeChild>,
+  render: MarkdownRenderCallback,
   renderOptions?: MaybeRef<MarkdownRenderOptions | undefined>
 ): UseMarkdownResult<ShallowRef<VNodeChild | null>> {
   const content = shallowRef<VNodeChild | null>(null);
@@ -37,8 +38,9 @@ export function useMarkdownRender(
   };
 
   const schedule = (value: string, options?: MarkdownRenderOptions): void => {
-    const dynamic = options?.dynamic ?? false;
-    const debounceMs = options?.debounceMs ?? 250;
+    const mode = options?.mode ?? 'static';
+    const dynamic = options?.dynamic ?? mode === 'streaming';
+    const debounceMs = options?.debounceMs ?? (mode === 'streaming' ? 80 : 250);
 
     if (timer != null) {
       globalThis.clearTimeout(timer);

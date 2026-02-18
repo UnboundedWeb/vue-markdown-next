@@ -68,13 +68,24 @@ export const i18n = createI18n({
       app: {
         eyebrow: 'packages/vue · playground',
         title: 'Markdown Next Preview',
-        subtitle: "左侧编辑，右侧使用 {'@'}markdown-next/vue 渲染结果。",
+        subtitle:
+          '统一预览台：左侧保留编辑器测试，新增 OpenAI 流式演示页面用于验证 streamdown 行为。',
         badge: 'Test Suite',
+      },
+      navigation: {
+        label: '页面模式',
+        playground: '编辑器预览',
+        stream: 'OpenAI 流式演示',
       },
       language: {
         label: '语言',
         zh: '中文',
         en: 'English',
+      },
+      playground: {
+        wordCount: '词数',
+        charCount: '字符数',
+        workerCount: 'Worker 数',
       },
       editor: {
         title: 'Markdown 编辑器',
@@ -100,18 +111,53 @@ export const i18n = createI18n({
         live: 'Live',
         custom: 'Custom',
       },
+      stream: {
+        controlTitle: 'OpenAI 配置',
+        controlDescription: '填写 API 参数并发起流式请求，右侧实时验证 markdown 渲染效果。',
+        statusStreaming: 'Streaming',
+        statusIdle: 'Idle',
+        apiBaseUrl: 'API Base URL',
+        modelName: '模型名称',
+        apiKey: 'API Key',
+        showKey: '显示',
+        hideKey: '隐藏',
+        temperature: 'Temperature',
+        systemPrompt: 'System Prompt',
+        userPrompt: 'User Prompt',
+        run: '开始流式请求',
+        stop: '停止',
+        clear: '清空输出',
+        securityHint:
+          '提示：API Key 仅保留在当前页面内存，不会写入本地存储。若模型不支持自定义 temperature，会自动回退到默认值请求。',
+        outputTitle: '实时渲染输出',
+        outputDescription: '使用 @markdown-next/vue 的 streaming 模式渲染逐块增量内容。',
+        chunkCount: 'Chunk 数',
+        elapsedMs: '耗时(ms)',
+        emptyState: '等待输出。先填写配置并点击“开始流式请求”。',
+      },
     },
     en: {
       app: {
         eyebrow: 'packages/vue · playground',
         title: 'Markdown Next Preview',
-        subtitle: "Edit on the left, rendered by {'@'}markdown-next/vue on the right.",
+        subtitle:
+          'Unified preview lab: keep editor-driven testing and add an OpenAI streaming page to validate streamdown behavior.',
         badge: 'Test Suite',
+      },
+      navigation: {
+        label: 'Page Mode',
+        playground: 'Editor Preview',
+        stream: 'OpenAI Stream Demo',
       },
       language: {
         label: 'Language',
         zh: '中文',
         en: 'English',
+      },
+      playground: {
+        wordCount: 'Words',
+        charCount: 'Chars',
+        workerCount: 'Workers',
       },
       editor: {
         title: 'Markdown Editor',
@@ -136,6 +182,32 @@ export const i18n = createI18n({
       status: {
         live: 'Live',
         custom: 'Custom',
+      },
+      stream: {
+        controlTitle: 'OpenAI Configuration',
+        controlDescription:
+          'Fill API parameters and start streaming. Use the right panel to verify markdown rendering in real time.',
+        statusStreaming: 'Streaming',
+        statusIdle: 'Idle',
+        apiBaseUrl: 'API Base URL',
+        modelName: 'Model Name',
+        apiKey: 'API Key',
+        showKey: 'Show',
+        hideKey: 'Hide',
+        temperature: 'Temperature',
+        systemPrompt: 'System Prompt',
+        userPrompt: 'User Prompt',
+        run: 'Start Stream',
+        stop: 'Stop',
+        clear: 'Clear Output',
+        securityHint:
+          'Note: API key stays in page memory only and is never persisted. If a model rejects custom temperature, the request retries with default temperature.',
+        outputTitle: 'Live Render Output',
+        outputDescription:
+          'Renders incremental markdown blocks using @markdown-next/vue streaming mode.',
+        chunkCount: 'Chunks',
+        elapsedMs: 'Elapsed(ms)',
+        emptyState: 'Waiting for output. Fill the form and click "Start Stream".',
       },
     },
   },

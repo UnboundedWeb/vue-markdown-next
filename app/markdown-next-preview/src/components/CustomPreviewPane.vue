@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { MarkdownRenderer, MarkdownWorkerPoll } from '@markdown-next/vue';
-import type { ParserOptions } from '@markdown-next/parser';
 import { CustomCodeRenderer, customComponents } from './customRenderers';
 import { useI18n } from 'vue-i18n';
+import { defaultParserOptions } from '../constants/defaultParserOptions';
 
 defineProps<{
   markdown: string;
@@ -10,11 +10,6 @@ defineProps<{
 }>();
 
 const { t } = useI18n();
-
-const parserOptions: ParserOptions = {
-  supportsLaTeX: true,
-  extendedGrammar: ['gfm', 'mathjax'],
-};
 </script>
 
 <template>
@@ -28,11 +23,12 @@ const parserOptions: ParserOptions = {
     </div>
     <MarkdownWorkerPoll
       :worker-count="workerCount"
-      :parserOptions="parserOptions"
+      :parserOptions="defaultParserOptions"
       :components="customComponents"
       :codeRenderer="CustomCodeRenderer"
+      mode="streaming"
     >
-      <MarkdownRenderer :dynamic="true" class="preview preview-custom" :markdown="markdown" />
+      <MarkdownRenderer class="preview preview-custom" :markdown="markdown" />
     </MarkdownWorkerPoll>
   </section>
 </template>

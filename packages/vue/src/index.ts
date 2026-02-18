@@ -5,7 +5,9 @@ export { useMarkdownWorkerPool } from './hooks/useMarkdownWorkerPool';
 export type {
   MarkdownComponent,
   MarkdownComponents,
+  MarkdownRenderMode,
   MarkdownRenderOptions,
+  MarkdownStreamdownOptions,
   MarkdownRendererProps,
   MarkdownWorkerPollProps,
   UseMarkdownResult,

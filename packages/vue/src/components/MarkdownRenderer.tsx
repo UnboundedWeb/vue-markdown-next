@@ -18,7 +18,9 @@ import type {
   LoadingSlot,
   MarkdownComponent,
   MarkdownComponents,
+  MarkdownRenderMode,
   MarkdownRenderOptions,
+  MarkdownStreamdownOptions,
 } from '../types';
 import { githubContainerStyle } from '../styles/themeGithub';
 import { toError } from '../utils/toError';
@@ -63,13 +65,25 @@ export const MarkdownRenderer = defineComponent({
       required: false,
       default: undefined,
     },
+    mode: {
+      type: String as PropType<MarkdownRenderMode>,
+      required: false,
+      default: 'static',
+    },
+    streamdown: {
+      type: Object as PropType<MarkdownStreamdownOptions>,
+      required: false,
+      default: undefined,
+    },
     dynamic: {
       type: Boolean,
-      default: false,
+      required: false,
+      default: undefined,
     },
     debounceMs: {
       type: Number,
-      default: 250,
+      required: false,
+      default: undefined,
     },
     loadingSlot: {
       type: [Object, Function] as PropType<LoadingSlot>,
@@ -83,26 +97,41 @@ export const MarkdownRenderer = defineComponent({
     const context = inject(markdownWorkerContextKey, null);
     const renderError = ref<Error | null>(null);
 
-    const renderOptions = computed<MarkdownRenderOptions>(() => {
+    const normalizeRenderOptions = (
+      source: MarkdownRenderOptions | undefined,
+      defaultMode: MarkdownRenderMode
+    ): MarkdownRenderOptions => {
       const options: MarkdownRenderOptions = {
-        dynamic: props.dynamic,
-        debounceMs: props.debounceMs,
+        mode: source?.mode ?? defaultMode,
       };
+      if (source?.streamdown) options.streamdown = source.streamdown;
+      if (source?.components) options.components = source.components;
+      if (source?.codeRenderer) options.codeRenderer = source.codeRenderer;
+      if (source?.loadingSlot) options.loadingSlot = source.loadingSlot;
+      if (source?.dynamic != null) options.dynamic = source.dynamic;
+      if (source?.debounceMs != null) options.debounceMs = source.debounceMs;
+      return options;
+    };
 
+    const ownRenderOptions = computed<MarkdownRenderOptions>(() => {
+      const ownOptions: MarkdownRenderOptions = {
+        mode: props.mode,
+      };
+      if (props.streamdown) ownOptions.streamdown = props.streamdown;
+      if (props.components) ownOptions.components = props.components;
+      if (props.codeRenderer) ownOptions.codeRenderer = props.codeRenderer;
+      if (props.loadingSlot) ownOptions.loadingSlot = props.loadingSlot;
+      if (props.dynamic != null) ownOptions.dynamic = props.dynamic;
+      if (props.debounceMs != null) ownOptions.debounceMs = props.debounceMs;
+      return normalizeRenderOptions(ownOptions, 'static');
+    });
+
+    const renderOptions = computed<MarkdownRenderOptions>(() => {
       if (context?.forceRenderOptions.value) {
-        const ctxOptions = context.renderOptions.value;
-        if (ctxOptions?.components) options.components = ctxOptions.components;
-        if (ctxOptions?.codeRenderer) options.codeRenderer = ctxOptions.codeRenderer;
-        if (ctxOptions?.loadingSlot) options.loadingSlot = ctxOptions.loadingSlot;
-        options.dynamic = ctxOptions?.dynamic ?? false;
-        options.debounceMs = ctxOptions?.debounceMs ?? 250;
-        return options;
+        return normalizeRenderOptions(context.renderOptions.value, 'static');
       }
 
-      if (props.components) options.components = props.components;
-      if (props.codeRenderer) options.codeRenderer = props.codeRenderer;
-      if (props.loadingSlot) options.loadingSlot = props.loadingSlot;
-      return options;
+      return ownRenderOptions.value;
     });
 
     const renderState = context
