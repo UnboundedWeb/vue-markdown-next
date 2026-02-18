@@ -1,5 +1,6 @@
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import { once } from 'node:events';
+import { access } from 'node:fs/promises';
 import { request } from 'node:http';
 import { createServer } from 'node:net';
 import { dirname, resolve } from 'node:path';
@@ -10,6 +11,7 @@ import { chromium, type Browser, type Page } from 'playwright';
 
 const TEST_HOST = '127.0.0.1';
 const SERVER_READY_TIMEOUT = 120000;
+const E2E_SETUP_TIMEOUT = 600000;
 const KNOWN_BUG_ERROR_PATTERNS = [
   'Extraneous non-emits event listeners (ready)',
   'The file does not exist at',
@@ -19,6 +21,8 @@ const KNOWN_BUG_ERROR_PATTERNS = [
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = resolve(currentDir, '../../../../');
+const parserDistEntry = resolve(workspaceRoot, 'packages/parser/dist/index.mjs');
+const vueDistEntry = resolve(workspaceRoot, 'packages/vue/dist/index.mjs');
 
 let browser: Browser;
 let devServer: ChildProcessWithoutNullStreams;
@@ -51,6 +55,27 @@ function runPnpm(args: string[]): Promise<string> {
       }
     });
   });
+}
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function ensurePackageBuilds(): Promise<void> {
+  const parserBuilt = await fileExists(parserDistEntry);
+  if (!parserBuilt) {
+    await runPnpm(['--filter', '@markdown-next/parser', 'build']);
+  }
+
+  const vueBuilt = await fileExists(vueDistEntry);
+  if (!vueBuilt) {
+    await runPnpm(['--filter', '@markdown-next/vue', 'build']);
+  }
 }
 
 function getRandomPort(): Promise<number> {
@@ -143,8 +168,7 @@ function expectNoKnownBugErrors(runtimeErrors: string[]): void {
 
 describe('vite7 worker pool e2e', () => {
   beforeAll(async () => {
-    await runPnpm(['--filter', '@markdown-next/parser', 'build']);
-    await runPnpm(['--filter', '@markdown-next/vue', 'build']);
+    await ensurePackageBuilds();
     await runPnpm(['--filter', '@markdown-next/vue', 'exec', 'playwright', 'install', 'chromium']);
 
     serverPort = await getRandomPort();
@@ -179,7 +203,7 @@ describe('vite7 worker pool e2e', () => {
 
     await waitForServer(baseUrl, SERVER_READY_TIMEOUT);
     browser = await chromium.launch({ headless: true });
-  });
+  }, E2E_SETUP_TIMEOUT);
 
   afterAll(async () => {
     if (browser) await browser.close();
