@@ -4,6 +4,7 @@ import type { ParserOptions } from './parser';
 
 const WORKER_MODULE_PATH = './modules/parser.worker.mjs';
 const VITE_OPTIMIZED_DEPS_SEGMENT = '/.vite/deps/';
+const PACKAGE_DIST_WORKER_URL = new URL('./modules/parser.worker.mjs', import.meta.url);
 
 /**
  * Worker 实例接口
@@ -74,6 +75,12 @@ function getMaxWorkers(): number {
 export function resolveBrowserWorkerURL(moduleUrl: string = import.meta.url): URL {
   if (moduleUrl.includes(VITE_OPTIMIZED_DEPS_SEGMENT)) {
     return new URL('../../@markdown-next/parser/dist/modules/parser.worker.mjs', moduleUrl);
+  }
+
+  // Keep a static `new URL(..., import.meta.url)` path so bundlers can rewrite
+  // and emit the worker asset in production builds.
+  if (moduleUrl === import.meta.url) {
+    return PACKAGE_DIST_WORKER_URL;
   }
 
   return new URL(WORKER_MODULE_PATH, moduleUrl);

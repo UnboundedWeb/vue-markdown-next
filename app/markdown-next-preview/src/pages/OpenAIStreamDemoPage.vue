@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { MarkdownRenderer, MarkdownWorkerPoll } from '@markdown-next/vue';
+import { MarkdownRenderer } from '@markdown-next/vue';
 import { defaultParserOptions } from '../constants/defaultParserOptions';
 import { useOpenAIChatStream } from '../composables/useOpenAIChatStream';
 
@@ -169,14 +169,13 @@ const clearOutput = (): void => {
       <p v-if="error" class="error-box">{{ error }}</p>
 
       <div v-if="hasOutput" class="preview-shell">
-        <MarkdownWorkerPoll :worker-count="1" :parserOptions="defaultParserOptions">
-          <MarkdownRenderer
-            class="preview stream-preview"
-            mode="streaming"
-            :streamdown="{ parseIncompleteMarkdown: true }"
-            :markdown="renderedMarkdown"
-          />
-        </MarkdownWorkerPoll>
+        <MarkdownRenderer
+          class="preview stream-preview"
+          mode="streaming"
+          :streamdown="{ parseIncompleteMarkdown: true }"
+          :parserOptions="defaultParserOptions"
+          :markdown="renderedMarkdown"
+        />
       </div>
       <div v-else class="empty-state">
         <p>{{ t('stream.emptyState') }}</p>

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { MarkdownRenderer, MarkdownWorkerPoll } from '@markdown-next/vue';
+import { MarkdownRenderer } from '@markdown-next/vue';
 import { CustomCodeRenderer, customComponents } from './customRenderers';
 import { useI18n } from 'vue-i18n';
 import { defaultParserOptions } from '../constants/defaultParserOptions';
 
 defineProps<{
   markdown: string;
-  workerCount: number;
 }>();
 
 const { t } = useI18n();
@@ -21,14 +20,15 @@ const { t } = useI18n();
       </div>
       <div class="status">{{ t('status.custom') }}</div>
     </div>
-    <MarkdownWorkerPoll
-      :worker-count="workerCount"
+
+    <MarkdownRenderer
+      class="preview preview-custom"
+      mode="streaming"
+      :streamdown="{ parseIncompleteMarkdown: true }"
       :parserOptions="defaultParserOptions"
       :components="customComponents"
       :codeRenderer="CustomCodeRenderer"
-      mode="streaming"
-    >
-      <MarkdownRenderer class="preview preview-custom" :markdown="markdown" />
-    </MarkdownWorkerPoll>
+      :markdown="markdown"
+    />
   </section>
 </template>

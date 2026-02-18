@@ -7,7 +7,6 @@ import CustomPreviewPane from '../components/CustomPreviewPane.vue';
 import { markdownSamples, type Locale } from '../i18n';
 
 const { locale, t } = useI18n();
-const workerCount = 1;
 const markdown = ref(markdownSamples[locale.value as Locale]);
 
 watch(locale, (next, prev) => {
@@ -30,13 +29,12 @@ const charCount = computed(() => markdown.value.length);
   <section class="workspace-meta">
     <span>{{ t('playground.wordCount') }}: {{ wordCount }}</span>
     <span>{{ t('playground.charCount') }}: {{ charCount }}</span>
-    <span>{{ t('playground.workerCount') }}: {{ workerCount }}</span>
   </section>
 
   <main class="workspace">
     <EditorPane v-model="markdown" />
-    <LivePreviewPane :markdown="markdown" :worker-count="workerCount" />
-    <CustomPreviewPane :markdown="markdown" :worker-count="workerCount" />
+    <LivePreviewPane :markdown="markdown" />
+    <CustomPreviewPane :markdown="markdown" />
   </main>
 </template>
 
