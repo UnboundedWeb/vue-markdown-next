@@ -85,38 +85,66 @@ const defaultComponents = {
 3. Default styled components
 4. Native HTML tags
 
-#### 4. Dynamic Mode & Debouncing
+#### 4. Mode-Aware Scheduling (Static / Streaming)
 
-Dynamic mode is designed for live editor scenarios, avoiding frequent re-renders through a debouncing mechanism:
+Scheduling defaults are derived from `mode`, then can be overridden explicitly:
+
+- `static` mode: `dynamic` defaults to `false`, `debounceMs` defaults to `250`
+- `streaming` mode: `dynamic` defaults to `true`, `debounceMs` defaults to `80`
 
 ```typescript
 const schedule = (value: string, options?: MarkdownRenderOptions): void => {
-  const dynamic = options?.dynamic ?? false;
-  const debounceMs = options?.debounceMs ?? 250;
+  const mode = options?.mode ?? 'static';
+  const dynamic = options?.dynamic ?? mode === 'streaming';
+  const debounceMs = options?.debounceMs ?? (mode === 'streaming' ? 80 : 250);
+
+  if (timer != null) {
+    clearTimeout(timer);
+    timer = null;
+  }
 
   if (dynamic) {
-    // Clear previous timer
-    if (timer != null) clearTimeout(timer);
-
-    // Delay execution
     timer = setTimeout(() => {
       void run(value, options);
     }, debounceMs);
-  } else {
-    // Execute immediately
-    void run(value, options);
+    return;
   }
+
+  void run(value, options);
 };
 ```
 
 **Workflow:**
 
-1. Watch for changes in markdown content
-2. If `dynamic` mode is enabled, clear the previous timer and set a new delay
-3. Execute rendering after the debounce delay
+1. Watch markdown and render option changes
+2. Derive scheduling defaults from `mode`
+3. Debounce only when `dynamic` is enabled
 4. Use `taskId` to ensure only the latest render task updates the content (prevents race conditions)
 
-#### 5. Worker Pool Context
+#### 5. Streamdown Block Reuse
+
+When `mode` is `streaming`, the renderer switches from whole-document parsing to block-based incremental rendering:
+
+```typescript
+if (mode !== 'streaming') {
+  cachedBlocks = [];
+  const tree = await parser.parseToHAST(markdown);
+  return renderHastToVue(tree, options);
+}
+
+const preprocessedMarkdown = preprocessStreamingMarkdown(markdown, options?.streamdown);
+const blockSources = parseMarkdownIntoBlocks(preprocessedMarkdown);
+cachedBlocks = await parseBlocksWithCache(blockSources, cachedBlocks, parser);
+return h(
+  Fragment,
+  null,
+  cachedBlocks.map((block) => renderHastToVue(block.tree, options))
+);
+```
+
+`streamdown.parseIncompleteMarkdown` defaults to `true` and repairs incomplete markdown markers while tokens are still arriving, so partially received content can still render.
+
+#### 6. Worker Pool Context
 
 The `MarkdownWorkerPoll` component provides a shared Worker Pool to its children through Vue's `provide/inject` mechanism:
 
@@ -138,7 +166,7 @@ const context = inject(markdownWorkerContextKey, null);
 - **Performance Optimization**: Avoid creating separate Workers for each renderer
 - **Unified Configuration**: Configure parser and render options at the Pool level
 
-#### 6. Style System
+#### 7. Style System
 
 The renderer uses an inline style system with a GitHub-flavored default theme:
 
@@ -170,7 +198,7 @@ function createStyledTag(tag: string) {
 - **Code Blocks**: Distinguish between inline code and block code, applying different styles
 - **Math Formulas**: MathJax tags are automatically filtered and don't receive custom components
 
-#### 7. Error Handling
+#### 8. Error Handling
 
 The renderer provides multi-level error handling:
 
@@ -194,7 +222,7 @@ try {
 
 When an error occurs, the renderer displays a friendly error message box with the error details.
 
-#### 8. Loading State Management
+#### 9. Loading State Management
 
 The renderer provides clear loading state feedback:
 
@@ -229,14 +257,17 @@ const markdown = ref('# Hello World');
 
 #### Props
 
-| Prop            | Type                 | Default      | Description                                                                                |
-| --------------- | -------------------- | ------------ | ------------------------------------------------------------------------------------------ |
-| `markdown`      | `string`             | **required** | The markdown content to render                                                             |
-| `parserOptions` | `ParserOptions`      | `undefined`  | Parser options to control Markdown parsing behavior. [See Parser Options](#parser-options) |
-| `components`    | `MarkdownComponents` | `undefined`  | Custom component overrides                                                                 |
-| `codeRenderer`  | `MarkdownComponent`  | `undefined`  | Custom code block renderer                                                                 |
-| `dynamic`       | `boolean`            | `false`      | Enable reactive updates                                                                    |
-| `debounceMs`    | `number`             | `250`        | Debounce time for dynamic updates                                                          |
+| Prop            | Type                        | Default                                       | Description                                                                                |
+| --------------- | --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `markdown`      | `string`                    | **required**                                  | The markdown content to render                                                             |
+| `parserOptions` | `ParserOptions`             | `undefined`                                   | Parser options to control Markdown parsing behavior. [See Parser Options](#parser-options) |
+| `components`    | `MarkdownComponents`        | `undefined`                                   | Custom component overrides                                                                 |
+| `codeRenderer`  | `MarkdownComponent`         | `undefined`                                   | Custom code block renderer                                                                 |
+| `mode`          | `'static' \| 'streaming'`   | `'static'`                                    | Rendering mode                                                                             |
+| `streamdown`    | `MarkdownStreamdownOptions` | `undefined`                                   | Streamdown options used in `streaming` mode                                                |
+| `dynamic`       | `boolean`                   | mode-aware (`false` static, `true` streaming) | Whether to debounce render scheduling                                                      |
+| `debounceMs`    | `number`                    | mode-aware (`250` static, `80` streaming)     | Debounce delay (ms)                                                                        |
+| `loadingSlot`   | `LoadingSlot`               | `undefined`                                   | Custom loading content shown before first successful render                                |
 
 #### Parser Options
 
@@ -314,9 +345,9 @@ const parserOptions: ParserOptions = {
 `MarkdownRenderer` creates a new parser instance on each instantiation. If you need to share parser configuration across multiple components, use the `MarkdownWorkerPoll` component.
 :::
 
-#### Dynamic Mode
+#### Streaming Mode
 
-Enable `dynamic` mode for reactive markdown updates with debouncing:
+Use `streaming` mode for append-only or token-by-token content (for example, LLM output). It enables streamdown block reuse and mode-aware scheduling defaults:
 
 ```vue
 <script setup lang="ts">
@@ -324,19 +355,18 @@ import { MarkdownRenderer } from '@markdown-next/vue';
 import { ref } from 'vue';
 
 const markdown = ref('');
-
-function handleInput(e: Event) {
-  markdown.value = (e.target as HTMLTextAreaElement).value;
-}
 </script>
 
 <template>
-  <div>
-    <textarea @input="handleInput" :value="markdown" />
-    <MarkdownRenderer :markdown="markdown" :dynamic="true" :debounceMs="300" />
-  </div>
+  <MarkdownRenderer
+    :markdown="markdown"
+    mode="streaming"
+    :streamdown="{ parseIncompleteMarkdown: true }"
+  />
 </template>
 ```
+
+When you need deterministic full-document rendering, use `mode="static"` (the default), or explicitly override scheduling with `:dynamic` / `:debounceMs`.
 
 ### MarkdownWorkerPoll
 
@@ -356,28 +386,36 @@ const parserOptions = {
 </script>
 
 <template>
-  <MarkdownWorkerPoll :worker-count="2" :parserOptions="parserOptions">
-    <MarkdownRenderer :markdown="markdown1" :dynamic="true" />
-    <MarkdownRenderer :markdown="markdown2" :dynamic="true" />
+  <MarkdownWorkerPoll
+    :worker-count="2"
+    :parserOptions="parserOptions"
+    mode="streaming"
+    :streamdown="{ parseIncompleteMarkdown: true }"
+  >
+    <MarkdownRenderer :markdown="markdown1" />
+    <MarkdownRenderer :markdown="markdown2" />
   </MarkdownWorkerPoll>
 </template>
 ```
 
 #### Props
 
-| Prop              | Type                        | Default     | Description                                                                                                                                                                                                                  |
-| ----------------- | --------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workerCount`     | `number`                    | `1`         | Number of worker threads                                                                                                                                                                                                     |
-| `parserOptions`   | `ParserOptions`             | `undefined` | Parser options for all child components. Supports all `ParserOptions` configuration items, or you can configure specific options individually (e.g., `customTags`, `extendedGrammar`). [See Parser Options](#parser-options) |
-| `components`      | `MarkdownComponents`        | `undefined` | Custom component overrides for all children                                                                                                                                                                                  |
-| `codeRenderer`    | `MarkdownComponent`         | `undefined` | Custom code renderer for all children                                                                                                                                                                                        |
-| `dynamic`         | `boolean`                   | `undefined` | Enable reactive updates for all children                                                                                                                                                                                     |
-| `debounceMs`      | `number`                    | `undefined` | Debounce time (ms) for all children                                                                                                                                                                                          |
-| `customTags`      | `string[]`                  | `undefined` | Custom allowed HTML tags (merged into `parserOptions`)                                                                                                                                                                       |
-| `extendedGrammar` | `Array<'gfm' \| 'mathjax'>` | `undefined` | Extended syntax support (merged into `parserOptions`)                                                                                                                                                                        |
-| `remarkPlugins`   | `PluggableList`             | `undefined` | Custom remark plugins (merged into `parserOptions`)                                                                                                                                                                          |
-| `rehypePlugins`   | `PluggableList`             | `undefined` | Custom rehype plugins (merged into `parserOptions`)                                                                                                                                                                          |
-| `mathJaxConfig`   | `MathJaxOptions`            | `undefined` | MathJax configuration (merged into `parserOptions`)                                                                                                                                                                          |
+| Prop              | Type                        | Default      | Description                                                                                                                                                                                                                  |
+| ----------------- | --------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workerCount`     | `number`                    | **required** | Number of worker threads                                                                                                                                                                                                     |
+| `parserOptions`   | `ParserOptions`             | `undefined`  | Parser options for all child components. Supports all `ParserOptions` configuration items, or you can configure specific options individually (e.g., `customTags`, `extendedGrammar`). [See Parser Options](#parser-options) |
+| `components`      | `MarkdownComponents`        | `undefined`  | Force component overrides for all children                                                                                                                                                                                   |
+| `codeRenderer`    | `MarkdownComponent`         | `undefined`  | Force code renderer for all children                                                                                                                                                                                         |
+| `mode`            | `'static' \| 'streaming'`   | `undefined`  | Force rendering mode for all children                                                                                                                                                                                        |
+| `streamdown`      | `MarkdownStreamdownOptions` | `undefined`  | Force streamdown options for all children                                                                                                                                                                                    |
+| `dynamic`         | `boolean`                   | `undefined`  | Force scheduling strategy for all children                                                                                                                                                                                   |
+| `debounceMs`      | `number`                    | `undefined`  | Force debounce delay (ms) for all children                                                                                                                                                                                   |
+| `loadingSlot`     | `LoadingSlot`               | `undefined`  | Force loading slot for all children                                                                                                                                                                                          |
+| `customTags`      | `string[]`                  | `undefined`  | Custom allowed HTML tags (merged into `parserOptions`)                                                                                                                                                                       |
+| `extendedGrammar` | `Array<'gfm' \| 'mathjax'>` | `undefined`  | Extended syntax support (merged into `parserOptions`)                                                                                                                                                                        |
+| `remarkPlugins`   | `PluggableList`             | `undefined`  | Custom remark plugins (merged into `parserOptions`)                                                                                                                                                                          |
+| `rehypePlugins`   | `PluggableList`             | `undefined`  | Custom rehype plugins (merged into `parserOptions`)                                                                                                                                                                          |
+| `mathJaxConfig`   | `MathJaxOptions`            | `undefined`  | MathJax configuration (merged into `parserOptions`)                                                                                                                                                                          |
 
 ::: tip
 `MarkdownWorkerPoll` provides two ways to configure parser options:
@@ -386,6 +424,8 @@ const parserOptions = {
 2. Configure specific options using individual props (e.g., `customTags`, `extendedGrammar`)
 
 Both approaches can be used simultaneously, with individual props taking precedence over the corresponding configuration in `parserOptions`.
+
+When `mode` / `streamdown` / `dynamic` / `debounceMs` / `loadingSlot` are set on `MarkdownWorkerPoll`, child `MarkdownRenderer` instances use those values as forced render options.
 :::
 
 ## Custom Components
@@ -509,7 +549,9 @@ import { MarkdownWorkerPool } from '@markdown-next/parser';
 const pool = new MarkdownWorkerPool({ workerCount: 2 });
 const markdown = ref('# Hello');
 
-const { content, loading, error } = useMarkdownWorkerPool(markdown, pool, { dynamic: true });
+const { content, loading, error } = useMarkdownWorkerPool(markdown, pool, {
+  mode: 'streaming',
+});
 ```
 
 ## Math Formula Rendering

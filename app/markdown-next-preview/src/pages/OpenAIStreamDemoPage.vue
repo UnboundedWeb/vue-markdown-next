@@ -99,7 +99,12 @@ const clearOutput = (): void => {
 
         <label class="field">
           <span>{{ t('stream.modelName') }}</span>
-          <input v-model="model" type="text" autocomplete="off" placeholder="gpt-4.1-mini" />
+          <input
+            v-model="model"
+            type="text"
+            autocomplete="off"
+            placeholder="gpt-5-nano-2025-08-07"
+          />
         </label>
 
         <label class="field">

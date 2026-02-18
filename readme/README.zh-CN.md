@@ -11,17 +11,20 @@
 
 - **高性能**：基于 unified/remark/rehype 生态系统，优化的渲染性能
 - **Worker 支持**：多线程解析，使用 Web Workers 和 Worker Pool 实现非阻塞 UI
+- **流式渲染**：支持 Streamdown 模式（`mode="streaming"`）实现增量 markdown 更新
 - **丰富语法**：支持 GitHub Flavored Markdown (GFM)、数学公式 (MathJax)、语法高亮
 - **Vue 3 集成**：从 Markdown AST 无缝渲染 Vue 组件
 - **可扩展**：Hook 系统支持自定义 Markdown 节点处理
 - **类型安全**：完整的 TypeScript 支持
 
-## 包结构
+## 工作区结构
 
 此 monorepo 包含：
 
 - **[@markdown-next/parser](../packages/parser)**：核心 Markdown 解析器，支持 Worker
 - **[@markdown-next/vue](../packages/vue)**：Vue 3 渲染器
+- **[markdown-next-preview](../app/markdown-next-preview)**：本地预览应用（含 Playground 与 OpenAI 流式演示）
+- **[markdown-next-docs](../app/markdown-next-docs)**：VitePress 文档站点
 
 ## 安装
 
@@ -53,7 +56,7 @@ const markdown = '# 你好世界\n\n这是 **markdown**！';
 - **Worker**：Comlink 实现无缝 Worker 通信
 - **插件**：remark-math、rehype-mathjax、remark-gfm
 - **构建工具**：tsup、vite
-- **测试工具**：vitest
+- **测试工具**：vitest + playwright（e2e）
 - **文档工具**：VitePress
 
 ## 文档

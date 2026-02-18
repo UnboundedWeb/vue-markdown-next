@@ -11,17 +11,20 @@
 
 - **High Performance**: Built on unified/remark/rehype ecosystem with optimized rendering
 - **Worker Support**: Multi-threaded parsing with Web Workers and Worker Pool for non-blocking UI
+- **Streaming Rendering**: Streamdown mode (`mode="streaming"`) for incremental markdown updates
 - **Rich Syntax**: GitHub Flavored Markdown (GFM), math formulas (MathJax), and syntax highlighting
 - **Vue 3 Integration**: Seamless Vue components rendering from markdown AST
 - **Extensible**: Hook system for custom markdown node processing
 - **Type Safe**: Full TypeScript support
 
-## Packages
+## Workspaces
 
 This monorepo contains:
 
 - **[@markdown-next/parser](./packages/parser)**: Core markdown parser with Worker support
 - **[@markdown-next/vue](./packages/vue)**: Vue 3 renderer for parsed markdown
+- **[markdown-next-preview](./app/markdown-next-preview)**: Local preview app with playground and OpenAI stream demo
+- **[markdown-next-docs](./app/markdown-next-docs)**: VitePress documentation site
 
 ## Installation
 
@@ -53,7 +56,7 @@ const markdown = '# Hello World\n\nThis is **markdown**!';
 - **Worker**: Comlink for seamless Worker communication
 - **Plugins**: remark-math, rehype-mathjax, remark-gfm
 - **Build**: tsup, vite
-- **Test**: vitest
+- **Test**: vitest + playwright (e2e)
 - **Docs**: VitePress
 
 ## Documentation

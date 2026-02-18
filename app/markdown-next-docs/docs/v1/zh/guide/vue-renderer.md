@@ -85,38 +85,66 @@ const defaultComponents = {
 3. 默认的样式组件
 4. 原生 HTML 标签
 
-#### 4. 动态模式与防抖 (Dynamic Mode & Debouncing)
+#### 4. 按模式调度 (Static / Streaming)
 
-动态模式专为实时编辑器场景设计，通过防抖机制避免频繁的重新渲染：
+调度默认值先由 `mode` 决定，再允许显式覆盖：
+
+- `static` 模式：`dynamic` 默认 `false`，`debounceMs` 默认 `250`
+- `streaming` 模式：`dynamic` 默认 `true`，`debounceMs` 默认 `80`
 
 ```typescript
 const schedule = (value: string, options?: MarkdownRenderOptions): void => {
-  const dynamic = options?.dynamic ?? false;
-  const debounceMs = options?.debounceMs ?? 250;
+  const mode = options?.mode ?? 'static';
+  const dynamic = options?.dynamic ?? mode === 'streaming';
+  const debounceMs = options?.debounceMs ?? (mode === 'streaming' ? 80 : 250);
+
+  if (timer != null) {
+    clearTimeout(timer);
+    timer = null;
+  }
 
   if (dynamic) {
-    // 清除之前的定时器
-    if (timer != null) clearTimeout(timer);
-
-    // 延迟执行渲染
     timer = setTimeout(() => {
       void run(value, options);
     }, debounceMs);
-  } else {
-    // 立即执行渲染
-    void run(value, options);
+    return;
   }
+
+  void run(value, options);
 };
 ```
 
 **工作流程：**
 
-1. 监听 markdown 内容的变化
-2. 如果启用了 `dynamic` 模式，清除之前的定时器并设置新的延迟
-3. 在防抖延迟后执行渲染
-4. 使用 `taskId` 确保只有最新的渲染任务会更新内容（防止竞态条件）
+1. 监听 markdown 内容和渲染选项变化
+2. 基于 `mode` 计算调度默认值
+3. 仅在启用 `dynamic` 时进行防抖
+4. 使用 `taskId` 确保只有最新任务可以提交结果（避免竞态条件）
 
-#### 5. Worker Pool 上下文 (Worker Pool Context)
+#### 5. Streamdown 块复用
+
+当 `mode` 为 `streaming` 时，渲染器会从整篇解析切换到按块增量渲染：
+
+```typescript
+if (mode !== 'streaming') {
+  cachedBlocks = [];
+  const tree = await parser.parseToHAST(markdown);
+  return renderHastToVue(tree, options);
+}
+
+const preprocessedMarkdown = preprocessStreamingMarkdown(markdown, options?.streamdown);
+const blockSources = parseMarkdownIntoBlocks(preprocessedMarkdown);
+cachedBlocks = await parseBlocksWithCache(blockSources, cachedBlocks, parser);
+return h(
+  Fragment,
+  null,
+  cachedBlocks.map((block) => renderHastToVue(block.tree, options))
+);
+```
+
+`streamdown.parseIncompleteMarkdown` 默认是 `true`，会在流式内容尚未完整时修复未闭合的 markdown 标记，提升中间态可渲染性。
+
+#### 6. Worker Pool 上下文 (Worker Pool Context)
 
 `MarkdownWorkerPoll` 组件通过 Vue 的 `provide/inject` 机制为其子组件提供共享的 Worker Pool：
 
@@ -138,7 +166,7 @@ const context = inject(markdownWorkerContextKey, null);
 - **性能优化**：避免为每个渲染器创建独立的 Worker
 - **统一配置**：在 Pool 层级统一配置解析器选项和渲染选项
 
-#### 6. 样式系统 (Style System)
+#### 7. 样式系统 (Style System)
 
 渲染器采用内联样式系统，提供 GitHub 风格的默认主题：
 
@@ -170,7 +198,7 @@ function createStyledTag(tag: string) {
 - **代码块**：区分行内代码和块级代码，应用不同的样式
 - **数学公式**：MathJax 标签自动被过滤，不应用自定义组件
 
-#### 7. 错误处理 (Error Handling)
+#### 8. 错误处理 (Error Handling)
 
 渲染器提供了多层次的错误处理：
 
@@ -194,7 +222,7 @@ try {
 
 当发生错误时，渲染器会显示一个友好的错误提示框，包含错误消息。
 
-#### 8. 加载状态管理 (Loading State)
+#### 9. 加载状态管理 (Loading State)
 
 渲染器提供清晰的加载状态反馈：
 
@@ -229,14 +257,17 @@ const markdown = ref('# 你好世界');
 
 #### 属性
 
-| 属性            | 类型                 | 默认值      | 说明                                                                  |
-| --------------- | -------------------- | ----------- | --------------------------------------------------------------------- |
-| `markdown`      | `string`             | **必需**    | 要渲染的 markdown 内容                                                |
-| `parserOptions` | `ParserOptions`      | `undefined` | 解析器选项，控制 Markdown 解析行为。[详见解析器选项说明](#解析器选项) |
-| `components`    | `MarkdownComponents` | `undefined` | 自定义组件覆盖                                                        |
-| `codeRenderer`  | `MarkdownComponent`  | `undefined` | 自定义代码块渲染器                                                    |
-| `dynamic`       | `boolean`            | `false`     | 启用响应式更新                                                        |
-| `debounceMs`    | `number`             | `250`       | 防抖时间（毫秒）                                                      |
+| 属性            | 类型                        | 默认值                                             | 说明                                                                  |
+| --------------- | --------------------------- | -------------------------------------------------- | --------------------------------------------------------------------- |
+| `markdown`      | `string`                    | **必需**                                           | 要渲染的 markdown 内容                                                |
+| `parserOptions` | `ParserOptions`             | `undefined`                                        | 解析器选项，控制 Markdown 解析行为。[详见解析器选项说明](#解析器选项) |
+| `components`    | `MarkdownComponents`        | `undefined`                                        | 自定义组件覆盖                                                        |
+| `codeRenderer`  | `MarkdownComponent`         | `undefined`                                        | 自定义代码块渲染器                                                    |
+| `mode`          | `'static' \| 'streaming'`   | `'static'`                                         | 渲染模式                                                              |
+| `streamdown`    | `MarkdownStreamdownOptions` | `undefined`                                        | `streaming` 模式下的 streamdown 选项                                  |
+| `dynamic`       | `boolean`                   | 与 mode 相关（static: `false`，streaming: `true`） | 是否启用防抖调度                                                      |
+| `debounceMs`    | `number`                    | 与 mode 相关（static: `250`，streaming: `80`）     | 防抖延迟（毫秒）                                                      |
+| `loadingSlot`   | `LoadingSlot`               | `undefined`                                        | 首次成功渲染前展示的自定义加载内容                                    |
 
 #### 解析器选项
 
@@ -314,9 +345,9 @@ const parserOptions: ParserOptions = {
 `MarkdownRenderer` 组件在每次实例化时会创建一个新的解析器实例。如果需要在多个组件间共享解析器配置，请使用 `MarkdownWorkerPoll` 组件。
 :::
 
-#### 动态模式
+#### 流式模式
 
-启用 `dynamic` 模式以实现带防抖的响应式 markdown 更新：
+对于逐步追加或 token-by-token 的内容（如 LLM 输出），建议使用 `streaming` 模式。该模式会启用 streamdown 块复用与 mode-aware 调度默认值：
 
 ```vue
 <script setup lang="ts">
@@ -324,19 +355,18 @@ import { MarkdownRenderer } from '@markdown-next/vue';
 import { ref } from 'vue';
 
 const markdown = ref('');
-
-function handleInput(e: Event) {
-  markdown.value = (e.target as HTMLTextAreaElement).value;
-}
 </script>
 
 <template>
-  <div>
-    <textarea @input="handleInput" :value="markdown" />
-    <MarkdownRenderer :markdown="markdown" :dynamic="true" :debounceMs="300" />
-  </div>
+  <MarkdownRenderer
+    :markdown="markdown"
+    mode="streaming"
+    :streamdown="{ parseIncompleteMarkdown: true }"
+  />
 </template>
 ```
+
+如果你需要稳定的整篇文档重算行为，使用 `mode="static"`（默认），或显式传入 `:dynamic` / `:debounceMs` 进行覆盖。
 
 ### MarkdownWorkerPoll
 
@@ -356,9 +386,14 @@ const parserOptions = {
 </script>
 
 <template>
-  <MarkdownWorkerPoll :worker-count="2" :parserOptions="parserOptions">
-    <MarkdownRenderer :markdown="markdown1" :dynamic="true" />
-    <MarkdownRenderer :markdown="markdown2" :dynamic="true" />
+  <MarkdownWorkerPoll
+    :worker-count="2"
+    :parserOptions="parserOptions"
+    mode="streaming"
+    :streamdown="{ parseIncompleteMarkdown: true }"
+  >
+    <MarkdownRenderer :markdown="markdown1" />
+    <MarkdownRenderer :markdown="markdown2" />
   </MarkdownWorkerPoll>
 </template>
 ```
@@ -367,12 +402,15 @@ const parserOptions = {
 
 | 属性              | 类型                        | 默认值      | 说明                                                                                                                                                    |
 | ----------------- | --------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workerCount`     | `number`                    | `1`         | Worker 线程数                                                                                                                                           |
+| `workerCount`     | `number`                    | **必需**    | Worker 线程数                                                                                                                                           |
 | `parserOptions`   | `ParserOptions`             | `undefined` | 所有子组件的解析器选项。支持所有 `ParserOptions` 配置项，也可以单独配置特定选项（如 `customTags`、`extendedGrammar` 等）。[详见解析器选项](#解析器选项) |
-| `components`      | `MarkdownComponents`        | `undefined` | 所有子组件的自定义组件覆盖                                                                                                                              |
-| `codeRenderer`    | `MarkdownComponent`         | `undefined` | 所有子组件的自定义代码渲染器                                                                                                                            |
-| `dynamic`         | `boolean`                   | `undefined` | 所有子组件是否启用响应式更新                                                                                                                            |
-| `debounceMs`      | `number`                    | `undefined` | 所有子组件的防抖时间（毫秒）                                                                                                                            |
+| `components`      | `MarkdownComponents`        | `undefined` | 强制所有子组件使用自定义组件覆盖                                                                                                                        |
+| `codeRenderer`    | `MarkdownComponent`         | `undefined` | 强制所有子组件使用自定义代码渲染器                                                                                                                      |
+| `mode`            | `'static' \| 'streaming'`   | `undefined` | 强制所有子组件使用渲染模式                                                                                                                              |
+| `streamdown`      | `MarkdownStreamdownOptions` | `undefined` | 强制所有子组件使用 streamdown 选项                                                                                                                      |
+| `dynamic`         | `boolean`                   | `undefined` | 强制所有子组件使用调度策略                                                                                                                              |
+| `debounceMs`      | `number`                    | `undefined` | 强制所有子组件使用防抖延迟（毫秒）                                                                                                                      |
+| `loadingSlot`     | `LoadingSlot`               | `undefined` | 强制所有子组件使用加载插槽                                                                                                                              |
 | `customTags`      | `string[]`                  | `undefined` | 自定义允许的 HTML 标签（会合并到 `parserOptions` 中）                                                                                                   |
 | `extendedGrammar` | `Array<'gfm' \| 'mathjax'>` | `undefined` | 扩展语法支持（会合并到 `parserOptions` 中）                                                                                                             |
 | `remarkPlugins`   | `PluggableList`             | `undefined` | 自定义 remark 插件（会合并到 `parserOptions` 中）                                                                                                       |
@@ -386,6 +424,8 @@ const parserOptions = {
 2. 通过单独的属性（如 `customTags`、`extendedGrammar` 等）配置特定选项
 
 这两种方式可以同时使用，单独的属性会覆盖 `parserOptions` 中的相应配置。
+
+当在 `MarkdownWorkerPoll` 上设置 `mode` / `streamdown` / `dynamic` / `debounceMs` / `loadingSlot` 时，子 `MarkdownRenderer` 会被强制使用这些渲染参数。
 :::
 
 ## 自定义组件(自定义样式)
@@ -495,6 +535,23 @@ watchEffect(() => {
     <component v-else :is="content" />
   </div>
 </template>
+```
+
+### useMarkdownWorkerPool
+
+直接使用 worker 池：
+
+```ts
+import { ref } from 'vue';
+import { useMarkdownWorkerPool } from '@markdown-next/vue';
+import { MarkdownWorkerPool } from '@markdown-next/parser';
+
+const pool = new MarkdownWorkerPool({ workerCount: 2 });
+const markdown = ref('# 你好');
+
+const { content, loading, error } = useMarkdownWorkerPool(markdown, pool, {
+  mode: 'streaming',
+});
 ```
 
 ## 数学公式渲染
