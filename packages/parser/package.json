@@ -1,6 +1,6 @@
 {
   "name": "@markdown-next/parser",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Markdown parser for markdown-next with single-threaded and multi-threaded support",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
