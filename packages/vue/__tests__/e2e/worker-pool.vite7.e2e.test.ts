@@ -17,6 +17,7 @@ const KNOWN_BUG_ERROR_PATTERNS = [
   'The file does not exist at',
   'document is not defined',
   '/.vite/deps/modules/parser.worker.mjs',
+  'Invalid linked format',
 ];
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
@@ -270,6 +271,21 @@ describe('vite7 worker pool e2e', () => {
       return heading?.textContent?.includes('Edge Update 8');
     });
     await page.waitForSelector('mjx-container');
+    expectNoKnownBugErrors(runtimeErrors);
+
+    await page.close();
+  });
+
+  it('renders stream demo route without i18n format errors', async () => {
+    const page = await browser.newPage();
+    const runtimeErrors = trackRuntimeErrors(page);
+
+    await page.goto(`${baseUrl}/#stream`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('.stream-control-pane h2');
+    await page.waitForSelector('.stream-output-pane h2');
+
+    const streamTitle = (await page.locator('.stream-control-pane h2').first().textContent()) ?? '';
+    expect(streamTitle.trim().length).toBeGreaterThan(0);
     expectNoKnownBugErrors(runtimeErrors);
 
     await page.close();
