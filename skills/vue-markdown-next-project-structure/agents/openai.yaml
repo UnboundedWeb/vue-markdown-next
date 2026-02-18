@@ -1,0 +1,3 @@
+interface:
+  display_name: "VMDN 项目结构"
+  short_description: "定位 parser/vue/preview/docs 目录与命令"
